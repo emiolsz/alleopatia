@@ -1,6 +1,8 @@
 import streamlit as st
 import requests
 from datetime import datetime
+# Importujemy bazę roślin z naszego nowego pliku baza.py
+from baza import baza_roslin
 
 # ==========================================
 # 1. KONFIGURACJA STRONY I WIZUALNEGO STYLU
@@ -13,6 +15,8 @@ st.markdown("""
     h1 {color: #2e5a27; font-family: 'Arial', sans-serif;}
     .stButton>button {background-color: #2e5a27; color: white; border-radius: 10px; width: 100%; font-weight: bold; height: 3em;}
     .stButton>button:hover {background-color: #3d7934; color: white;}
+    .card {background-color: white; padding: 20px; border-radius: 10px; box-shadow: 1px 1px 5px rgba(0,0,0,0.05); margin-bottom: 15px;}
+    .alert-badge {background-color: #ff4b4b; color: white; padding: 4px 8px; border-radius: 5px; font-weight: bold; font-size: 0.8rem; display: inline-block; margin-right: 5px;}
     </style>
 """, unsafe_allow_html=True)
 
@@ -20,7 +24,7 @@ st.title("🌿 Grządkowisko")
 st.subheader("Twój inteligentny asystent ogrodowy")
 
 # ==========================================
-# 2. LOGIKA: KALENDARZ KSIĘŻYCOWY (FAZY)
+# 2. LOGIKA: KALENDARZ (DATA, DZIEŃ, IMIENINY) i KSIĘŻYC
 # ==========================================
 def pobierz_faze_ksiezyca():
     dzis = datetime.now()
@@ -44,6 +48,42 @@ def pobierz_faze_ksiezyca():
     else:
         return "🌗 Ostatnia kwadra", "Dni Korzenia. Soki schodzą w dół. Najlepszy czas na siew marchewki, pietruszki, rzodkiewki."
 
+# Rozbudowana baza imienin na cały rok (przykładowe popularne dni ogrodnicze)
+baza_imienin = {
+    1: {1: "Mieszka, Mieczysława", 2: "Makarego, Bazylego", 22: "Wincentego, Anastazego"},
+    2: {2: "Marii, Mirosława", 14: "Walentego, Cyryla"},
+    3: {4: "Kazimierza, Łucji", 19: "Józefa, Bogdana"},
+    4: {23: "Wojciecha, Jerzego", 30: "Mariana, Katarzyny"},
+    5: {1: "Józefa, Jerzego", 8: "Stanisława, Lizy", 12: "Pankracego (Ogrodnika)", 13: "Serwacego (Ogrodnika)", 14: "Bonifacego (Ogrodnika)", 15: "Zofii (Zimnej Zośki), Izydora", 22: "Heleny, Julii", 23: "Emilii, Iwony"},
+    6: {1: "Jakuba, Konrada", 24: "Jana, Danuty", 29: "Piotra, Pawła"},
+    7: {22: "Magdaleny, Bolesława", 26: "Anny, Mirosławy"},
+    8: {15: "Marii, Napoleona", 26: "Marii, Częstochowskiej"},
+    9: {17: "Franciszka, Roberta", 30: "Zofii, Hieronima"},
+    10: {4: "Franciszka, Rozalii", 25: "Darii, Sambora"},
+    11: {1: "Wszystkich Świętych", 11: "Marcina, Bartłomieja", 30: "Andrzeja, Maurycego"},
+    12: {4: "Barbary, Krystiana", 6: "Mikołaja, Jacynty", 24: "Adama, Ewy"}
+}
+
+def pobierz_dane_kalendarza():
+    dzis = datetime.now()
+    dni_tygodnia = ["Poniedziałek", "Wtorek", "Środa", "Czwartek", "Piątek", "Sobota", "Niedziela"]
+    miesiace = ["stycznia", "lutego", "marca", "kwietnia", "maja", "czerwca", "lipca", "sierpnia", "września", "października", "listopada", "grudnia"]
+    
+    dzien_tyg = dni_tygodnia[dzis.weekday()]
+    nazwa_miesiaca = miesiace[dzis.month - 1]
+    
+    pelna_data = f"{dzien_tyg}, {dzis.day} {nazwa_miesiaca} {dzis.year}"
+    dzien_roku = dzis.timetuple().tm_yday
+    
+    imieniny = baza_imienin.get(dzis.month, {}).get(dzis.day, "Brak popularnych imienin w bazie")
+    return pelna_data, dzien_roku, imieniny
+
+# Wyświetlanie sekcji kalendarza w panelu bocznym
+pelna_data, dzien_roku, imieniny = pobierz_dane_kalendarza()
+st.sidebar.markdown("### 📅 Kalendarz")
+st.sidebar.markdown(f"**Data:** {pelna_data}\n\n**Dzień roku:** {dzien_roku}/365\n\n**Imieniny:** {imieniny}")
+
+# Sekcja księżycowa poniżej daty
 faza_nazwa, faza_porada = pobierz_faze_ksiezyca()
 st.sidebar.markdown(f"### 🌙 Kalendarz Księżycowy")
 st.sidebar.info(f"**Dzisiejsza faza:** {faza_nazwa}\n\n*Wytyczne:* {faza_porada}")
@@ -56,7 +96,7 @@ st.sidebar.markdown("### 🌤️ Pogoda dla Polski (IMGW)")
 @st.cache_data(ttl=3600)
 def pobierz_pogode_imgw():
     try:
-        url = "http://danepubliczne.imgw.pl/api/data/synop"
+        url = "https://imgw.pl"
         odpowiedz = requests.get(url, timeout=5)
         if odpowiedz.status_code == 200:
             return odpowiedz.json()
@@ -69,12 +109,33 @@ if dane_pogodowe:
     stacje = [stacja['stacja'] for stacja in dane_pogodowe]
     wybrane_miasto = st.sidebar.selectbox("Wybierz stację pomiarową:", sorted(stacje))
     dane_stacji = next(item for item in dane_pogodowe if item["stacja"] == wybrane_miasto)
+    
     temp = float(dane_stacji['temperatura'])
     opad = float(dane_stacji['suma_opadu'])
+    wilgotnosc = float(dane_stacji.get('wilgotnosc_wzgledna', 0))
     
-    st.sidebar.metric(label="Temperatura", value=f"{temp} °C")
-    st.sidebar.metric(label="Suma opadów", value=f"{opad} mm")
+    # Wyświetlanie trzech metryk obok siebie
+    col_temp, col_opad, col_wilg = st.sidebar.columns(3)
+    col_temp.metric(label="Temp.", value=f"{temp} °C")
+    col_opad.metric(label="Opad", value=f"{opad} mm")
+    col_wilg.metric(label="Wilg.", value=f"{wilgotnosc} %")
     
+    # Wykrywanie zjawisk
+    zjawiska = []
+    if temp < 2.0:
+        zjawiska.append("❄️ Przymrozek")
+    if wilgotnosc > 95.0 and temp > 0:
+        zjawiska.append("🌫️ Mgła")
+    if wilgotnosc > 90.0 and temp <= 0:
+        zjawiska.append("🥶 Szadź")
+        
+    if zjawiska:
+        st.sidebar.markdown("**Wykryte zjawiska:**")
+        oznaczenia_html = "".join([f"<span class='alert-badge'>{z}</span>" for z in zjawiska])
+        st.sidebar.markdown(oznaczenia_html, unsafe_allow_html=True)
+    else:
+        st.sidebar.markdown("_Brak niebezpiecznych zjawisk._")
+        
     if temp < 4.0:
         st.sidebar.error("⚠️ Ryzyko przymrozku! Chroń wrażliwe rozsady agrowłókniną.")
     elif temp > 25.0 and opad == 0:
@@ -85,236 +146,29 @@ else:
     st.sidebar.warning("Nie udało się załadować danych meteo.")
 
 # ==========================================
-# 4. KOMPLETNA BAZA ROŚLIN Z ENCYKLOPEDIĄ
+# 4. INTERFEJS UŻYTKOWNIKA (WYSZUKIWARKA)
 # ==========================================
-baza_roslin = {
-    "Brokuł": {
-        "ph": "6.2 - 7.0", "swiatlo": "Pełne słońce", "woda": "Wysokie", "gleba": "Żyzna, próchnicza",
-        "porada": "Młode brokuły osłaniaj siatką przed motylami bielinkami.",
-        "korzystne": ["Brukselka", "Jarmuż", "Pasternak", "Pietruszka", "Por", "Ziemniak"],
-        "niekorzystne": ["Pomidor", "Cebula"]
-    },
-    "Brukselka": {
-        "ph": "6.5 - 7.5", "swiatlo": "Słoneczne", "woda": "Średnie", "gleba": "Ciężka, gliniasto-gliniasta",
-        "porada": "Zrywaj dolne liście jesienią, by przyspieszyć zawiązywanie małych główek.",
-        "korzystne": ["Brokuł", "Ziemniak"], "niekorzystne": ["Pomidor"]
-    },
-    "Burak ćwikłowy": {
-        "ph": "6.0 - 7.5", "swiatlo": "Słoneczne do półcienia", "woda": "Średnie", "gleba": "Przepuszczalna",
-        "porada": "Buraki uwielbiają bor, rzadko chorują posadzone obok cebuli.",
-        "korzystne": ["Cebula", "Cykoria", "Czosnek", "Groch", "Kalarepa", "Kapusta pekińska", "Koper", "Ogórek", "Pomidor", "Por", "Rzepa", "Rzodkiewka", "Sałata", "Seler"],
-        "niekorzystne": ["Fasola", "Gorczyca"]
-    },
-    "Cebula": {
-        "ph": "6.5 - 7.0", "swiatlo": "Pełne słońce", "woda": "Niskie", "gleba": "Żyzna, lekka",
-        "porada": "Wymieszaj z ziemią fusy z kawy przed sadzeniem dymki – spulchnią glebę i odstraszą szkodniki.",
-        "korzystne": ["Burak ćwikłowy", "Cukinie", "Cykoria", "Fasola", "Kalarepa", "Koper", "Marchew", "Ogórek", "Pasternak", "Pomidor", "Por", "Sałata"],
-        "niekorzystne": ["Groch", "Fasola tyczna", "Rzodkiewka"]
-    },
-    "Cukinia": {
-        "ph": "6.0 - 7.0", "swiatlo": "Słoneczne, ciepłe", "woda": "Wysokie", "gleba": "Bardzo żyzna, kompostowa",
-        "porada": "Podkładaj słomę pod rosnące owoce cukinii, aby uchronić je przed gniciem od wilgotnej ziemi.",
-        "korzystne": ["Cebula", "Groch", "Kukurydza", "Szpinak"], "niekorzystne": ["Ziemniak", "Rzodkiewka"]
-    },
-    "Cykoria": {
-        "ph": "6.0 - 6.7", "swiatlo": "Półcień", "woda": "Średnie", "gleba": "Głęboko uprawiona",
-        "porada": "Cykoria doskonale drenuje glebę swoimi głębokimi korzeniami.",
-        "korzystne": ["Burak ćwikłowy", "Cebula", "Kalarepa", "Marchew", "Pomidor"], "niekorzystne": []
-    },
-    "Czosnek": {
-        "ph": "6.5 - 7.0", "swiatlo": "Słoneczne", "woda": "Niskie", "gleba": "Próchnicza",
-        "porada": "Sadź czosnek pod drzewami owocowymi i obok pomidorów – naturalnie ogranicza rozwój chorób grzybowych.",
-        "korzystne": ["Burak ćwikłowy", "Marchew", "Pomidor"], "niekorzystne": ["Groch", "Fasola"]
-    },
-    "Dynia": {
-        "ph": "6.0 - 7.0", "swiatlo": "Słoneczne, osłonięte", "woda": "Wysokie", "gleba": "Bardzo bogata w składniki odżywcze",
-        "porada": "Dynia świetnie rośnie na pryzmie kompostowej, ocieniając ją swoimi liśćmi.",
-        "korzystne": ["Fasola", "Kukurydza"], "niekorzystne": ["Ziemniak"]
-    },
-    "Endywia": {
-        "ph": "6.0 - 6.8", "swiatlo": "Słoneczne", "woda": "Średnie", "gleba": "Żyzna, przepuszczalna",
-        "porada": "Związź liście na 2 tygodnie przed zbiorem, aby środek endywii zbladł i stracił gorzki smak.",
-        "korzystne": ["Cebula", "Fasola", "Kapusta pekińska", "Koper", "Marchew", "Pomidor", "Por", "Rzodkiewka"], "niekorzystne": []
-    },
-    "Fasola": {
-        "ph": "6.0 - 7.0", "swiatlo": "Słoneczne, osłonięte", "woda": "Średnie", "gleba": "Lekka, ciepła",
-        "porada": "Fasola wiąże azot z powietrza w glebie, działając jak darmowy nawóz dla sąsiadów.",
-        "korzystne": ["Cebula", "Cukinie", "Endywia", "Groch", "Kalarepa", "Kukurydza", "Ogórek", "Rzepa", "Seler", "Szpinak", "Ziemniak"],
-        "niekorzystne": ["Czosnek", "Por", "Burak ćwikłowy"]
-    },
-    "Groch": {
-        "ph": "6.0 - 7.0", "swiatlo": "Słoneczne", "woda": "Średnie", "gleba": "Przepuszczalna, lekka",
-        "porada": "Groch poprawia strukturę gleby. Nie sadź go w tym samym miejscu częściej niż co 4 lata.",
-        "korzystne": ["Burak ćwikłowy", "Cukinie", "Kalarepa", "Kapusta pekińska", "Kukurydza", "Marchew", "Ogórek", "Rzepa", "Rzodkiewka", "Seler", "Szpinak"],
-        "niekorzystne": ["Cebula", "Czosnek", "Por"]
-    },
-    "Jarmuż": {
-        "ph": "6.5 - 7.2", "swiatlo": "Słoneczne do półcienia", "woda": "Średnie", "gleba": "Gliniano-piaszczysta",
-        "porada": "Jarmuż smakuje najlepiej po pierwszych przymrozkach – traci wtedy gorycz i zyskuje słodycz.",
-        "korzystne": ["Brokuł", "Kapusta pekińska"], "niekorzystne": ["Pomidor"]
-    },
-    "Kalarepa": {
-        "ph": "6.0 - 6.8", "swiatlo": "Słoneczne", "woda": "Regularne", "gleba": "Żyzna, wilgotna",
-        "porada": "Nieregularne podlewanie powoduje, że bulwa kalarepy drewnieje i pęka.",
-        "korzystne": ["Burak ćwikłowy", "Cebula", "Cykoria", "Fasola", "Groch", "Marchew", "Ogórek", "Pomidor", "Por", "Rzodkiewka", "Seler", "Szpinak", "Ziemniak"],
-        "niekorzystne": []
-    },
-    "Kapusta pekińska": {
-        "ph": "6.2 - 7.0", "swiatlo": "Półcień", "woda": "Wysokie", "gleba": "Próchnicza, zasobna",
-        "porada": "Uprawiaj ją jako poplon – wysiewana w lipcu rzadziej wybija w pędy kwiatowe.",
-        "korzystne": ["Burak ćwikłowy", "Groch", "Jarmuż", "Koper", "Marchew", "Ogórek", "Papryka", "Pietruszka", "Pomidor", "Por", "Sałata", "Seler", "Szpinak"],
-        "niekorzystne": ["Rzodkiewka"]
-    },
-    "Koper": {
-        "ph": "6.0 - 7.0", "swiatlo": "Słoneczne", "woda": "Średnie", "gleba": "Przepuszczalna",
-        "porada": "Koper ogrodowy wspaniale stymuluje kiełkowanie nasion ogórków posadzonych tuż obok.",
-        "korzystne": ["Burak ćwikłowy", "Cebula", "Endywia", "Kapusta pekińska", "Marchew", "Ogórek", "Pietruszka", "Pomidor", "Seler", "Szparag", "Ziemniak"],
-        "niekorzystne": []
-    },
-    "Kukurydza": {
-        "ph": "6.0 - 7.0", "swiatlo": "Pełne słońce, gorące", "woda": "Wysokie w okresie kwitnienia", "gleba": "Bardzo bogata, głęboka",
-        "porada": "Stanowi naturalną, stabilną tyczkę dla pnącej się fasoli.",
-        "korzystne": ["Cukinie", "Dynia", "Fasola", "Groch", "Ogórek", "Pomidor"], "niekorzystne": []
-    },
-    "Marchew": {
-        "ph": "6.0 - 6.8", "swiatlo": "Pełne słońce", "woda": "Średnie", "gleba": "Lekka, piaszczysto-gliniasta",
-        "porada": "Siej marchew na przemian z cebulą. Zapachy tych roślin wzajemnie dezorientują ich najgroźniejsze szkodniki.",
-        "korzystne": ["Cebula", "Cykoria", "Czosnek", "Groch", "Kalarepa", "Kapusta pekińska", "Koper", "Por", "Rzodkiewka", "Sałata", "Seler", "Szczypiorek", "Szpinak"],
-        "niekorzystne": ["Pomidor"]
-    },
-    "Ogórek": {
-        "ph": "6.5 - 7.0", "swiatlo": "Słoneczne, zaciszne", "woda": "Bardzo wysokie (letnia woda!)", "gleba": "Mocno nawożona kompostem",
-        "porada": "Zrób nawóz ze skórek bananów (zalej je wodą na 24h) i podlewaj ogórki. Dostarczysz im potas niezbędny do owocowania.",
-        "korzystne": ["Burak ćwikłowy", "Cebula", "Fasola", "Groch", "Kalarepa", "Kapusta pekińska", "Koper", "Kukurydza", "Papryka", "Por", "Rzodkiewka", "Sałata", "Seler", "Szpinak"],
-        "niekorzystne": ["Pomidor", "Ziemniak"]
-    },
-    "Papryka": {
-        "ph": "6.0 - 6.8", "swiatlo": "Mocno słoneczne, upalne", "woda": "Regularne (wrażliwa na przesuszenie)", "gleba": "Żyzna, próchnicza",
-        "porada": "Ściółkuj podłoże wokół papryki, by utrzymać wysoką wilgotność i stałą temperaturę gleby.",
-        "korzystne": ["Kapusta pekińska", "Ogórek", "Pomidor"], "niekorzystne": ["Ziemniak"]
-    },
-    "Pasternak": {
-        "ph": "6.0 - 7.0", "swiatlo": "Słoneczne", "woda": "Średnie", "gleba": "Głęboko spulchniona",
-        "porada": "Nasiona pasternaku kiełkują bardzo długo – zachowaj cierpliwość, podłoże musi być stale wilgotne.",
-        "korzystne": ["Brokuł", "Cebula", "Rzepa", "Rzodkiewka", "Seler", "Szpinak", "Ziemniak"], "niekorzystne": []
-    },
-    "Pietruszka": {
-        "ph": "6.2 - 7.2", "swiatlo": "Słoneczne do półcienia", "woda": "Średnie", "gleba": "Żyzna, przepuszczalna",
-        "porada": "Pietruszka rosnąca blisko pomidorów wydajnie poprawia ich ogólny wigor oraz walory smakowe.",
-        "korzystne": ["Brokuł", "Kapusta pekińska", "Koper", "Pomidor", "Por", "Rzodkiewka"], "niekorzystne": ["Sałata"]
-    },
-    "Pomidor": {
-        "ph": "5.5 - 6.5", "swiatlo": "Słoneczne, bardzo ciepłe", "woda": "Wysokie (nigdy nie mocz liści!)", "gleba": "Żyzna, próchnicza",
-        "porada": "W maju zrób gnojówkę z młodych pokrzyw (1kg na 10L wody). Po rozcieńczeniu 1:10 podlewaj pomidory – dostaną potężnego kopa.",
-        "korzystne": ["Aksamitka", "Bazylia", "Burak ćwikłowy", "Cebula", "Cykoria", "Czosnek", "Endywia", "Kalarepa", "Kapusta pekińska", "Koper", "Kukurydza", "Papryka", "Pietruszka", "Por", "Rzodkiewka", "Sałata", "Seler", "Szpinak"],
-        "niekorzystne": ["Ziemniak", "Ogórek"]
-    },
-    "Por": {
-        "ph": "6.5 - 7.5", "swiatlo": "Słoneczne", "woda": "Wysokie", "gleba": "Głęboka, żyzna",
-        "porada": "Obsypuj pory ziemią w trakcie wzrostu, dzięki czemu uzyskasz dłuższą i grubszą białą część.",
-        "korzystne": ["Brokuł", "Burak ćwikłowy", "Cebula", "Endywia", "Kalarepa", "Kapusta pekińska", "Marchew", "Ogórek", "Pietruszka", "Pomidor", "Rzepa", "Rzodkiewka", "Sałata", "Seler", "Szpinak"],
-        "niekorzystne": ["Fasola", "Groch"]
-    },
-    "Rzepa": {
-        "ph": "6.0 - 7.0", "swiatlo": "Słoneczne", "woda": "Regularne", "gleba": "Lekka, piaszczysta",
-        "porada": "Uprawiaj rzepę wiosną lub jesienią, upały sprawiają, że korzeń staje się łykowaty.",
-        "korzystne": ["Burak ćwikłowy", "Fasola", "Groch", "Pasternak", "Por", "Seler"], "niekorzystne": []
-    },
-    "Rzodkiewka": {
-        "ph": "6.0 - 7.0", "swiatlo": "Słoneczne do półcienia", "woda": "Częste, ale oszczędne", "gleba": "Lekka, próchnicza",
-        "porada": "Siej rzodkiewkę co 2 tygodnie małymi partiami, aby cieszyć się chrupkimi zbiorami przez cały sezon.",
-        "korzystne": ["Burak ćwikłowy", "Endywia", "Groch", "Kalarepa", "Marchew", "Ogórek", "Pasternak", "Pietruszka", "Pomidor", "Por", "Seler", "Szpinak"],
-        "niekorzystne": ["Cebula", "Cukinia", "Kapusta pekińska"]
-    },
-    "Sałata": {
-        "ph": "6.0 - 7.0", "swiatlo": "Słoneczne lub delikatny półcień", "woda": "Średnie", "gleba": "Żyzna, przepuszczalna",
-        "porada": "Sałata rośnie bardzo szybko, dlatego idealnie sprawdza się jako roślina wskaźnikowa między wolno rosnącymi warzywami.",
-        "korzystne": ["Burak ćwikłowy", "Cebula", "Kapusta pekińska", "Marchew", "Ogórek", "Pomidor", "Por", "Szparag"],
-        "niekorzystne": ["Pietruszka"]
-    },
-    "Seler": {
-        "ph": "6.5 - 7.5", "swiatlo": "Słoneczne", "woda": "Bardzo wysokie", "gleba": "Bardzo zasobna, próchnicza",
-        "porada": "Seler potrzebuje mnóstwa składników odżywczych – ściółkuj go grubą warstwą dojrzałego kompostu.",
-        "korzystne": ["Burak ćwikłowy", "Fasola", "Groch", "Kalarepa", "Kapusta pekińska", "Koper", "Marchew", "Ogórek", "Pasternak", "Pomidor", "Por", "Rzepa", "Rzodkiewka", "Szpinak"],
-        "niekorzystne": []
-    },
-    "Skorzonera": {
-        "ph": "6.5 - 7.5", "swiatlo": "Słoneczne", "woda": "Średnie", "gleba": "Głęboko przekopana, lekka",
-        "porada": "Korzenie skorzonery mogą zimować w gruncie bez przykrycia – zbieraj je na bieżąco zimą.",
-        "korzystne": ["Por"], "niekorzystne": []
-    },
-    "Szczypiorek": {
-        "ph": "6.0 - 7.0", "swiatlo": "Słoneczne lub półcień", "woda": "Średnie", "gleba": "Żyzna, wilgotna",
-        "porada": "Regularne ścinanie szczypiorku stymuluje go do silniejszego krzewienia się.",
-        "korzystne": ["Marchew"], "niekorzystne": []
-    },
-    "Szparag": {
-        "ph": "6.5 - 7.5", "swiatlo": "Pełne słońce", "woda": "Umiarkowane", "gleba": "Piaszczysto-gliniasta, głęboka",
-        "porada": "Uprawa szparagów wymaga cierpliwości – pierwsze pełne zbiory przeprowadza się dopiero w 3. roku od posadzenia karp.",
-        "korzystne": ["Koper", "Sałata"], "niekorzystne": []
-    },
-    "Szpinak": {
-        "ph": "6.0 - 6.8", "swiatlo": "Półcień", "woda": "Wysokie", "gleba": "Dobra ogrodowa, wilgotna",
-        "porada": "Szpinak zawiera saponiny, które stymulują rozwój korzeni innych roślin rosnących w tej samej ziemi.",
-        "korzystne": ["Cukinia", "Fasola", "Groch", "Kalarepa", "Kapusta pekińska", "Marchew", "Ogórek", "Pasternak", "Pomidor", "Por", "Rzodkiewka", "Seler"],
-        "niekorzystne": []
-    },
-    "Ziemniak": {
-        "ph": "5.0 - 6.0", "swiatlo": "Słoneczne", "woda": "Średnie", "gleba": "Luźna, dobrze napowietrzona",
-        "porada": "Nigdy nie sadź ziemniaków po innych psiankowatych, aby zapobiec akumulacji patogenów w glebie.",
-        "korzystne": ["Brokuł", "Brukselka", "Fasola", "Koper", "Pasternak"],
-        "niekorzystne": ["Cukinia", "Dynia", "Ogórek", "Pomidor", "Papryka"]
-    },
-    "Aksamitka": {
-        "ph": "6.0 - 7.0", "swiatlo": "Słoneczne lub półcień", "woda": "Średnie", "gleba": "Dowolna",
-        "porada": "🛡️ Ochronny superbohater! Korzenie aksamitki wydzielają substancje niszczące nicienie glebowe. Zapach zniechęca mszyce i mączliki.",
-        "korzystne": ["Pomidor", "Ogórek", "Marchew", "Ziemniak", "Fasola", "Brokuł", "Brukselka", "Burak ćwikłowy", "Cebula", "Cukinia", "Kapusta pekińska", "Papryka", "Por", "Rzodkiewka", "Sałata", "Seler", "Szpinak"],
-        "niekorzystne": []
-    }
-}
+wybrana_roslina = st.selectbox("🔍 Wybierz roślinę, kwiat, zioło lub krzew/drzewo owocowe:", list(baza_roslin.keys()))
 
-# Inteligentne uzupełnianie relacji dwukierunkowych (symetria tabeli)
-for roslina, dane in baza_roslin.items():
-    for korz in dane["korzystne"]:
-        if korz in baza_roslin and roslina not in baza_roslin[korz]["korzystne"]:
-            baza_roslin[korz]["korzystne"].append(roslina)
-    for niekorz in dane["niekorzystne"]:
-        if niekorz in baza_roslin and roslina not in baza_roslin[niekorz]["niekorzystne"]:
-            baza_roslin[niekorz]["niekorzystne"].append(roslina)
-
-# ==========================================
-# 5. INTERFEJS UŻYTKOWNIKA (KALKULATOR)
-# ==========================================
-st.markdown("### 🔍 Kalkulator Dobrego Sąsiedztwa Roślin")
-st.write("Wybierz dwie rośliny ze swojego ogrodu, aby zweryfikować dopasowanie uprawy współrzędnej.")
-
-lista_roslin = sorted(list(baza_roslin.keys()))
-
-col1, col2 = st.columns(2)
-with col1:
-    roslina_a = st.selectbox("Roślina główna:", lista_roslin)
-with col2:
-    lista_sasiadow = [r for r in lista_roslin if r != roslina_a]
-    roslina_b = st.selectbox("Sąsiadujące warzywo/zioło:", lista_sasiadow)
-
-if st.button("Sprawdź relację między roślinami 🌿"):
-    dane_a = baza_roslin[roslina_a]
+if wybrana_roslina:
+    dane = baza_roslin[wybrana_roslina]
     
-    st.markdown("---")
-    st.markdown(f"### 📊 Wynik analizy dla zestawu: **{roslina_a} + {roslina_b}**")
+    st.markdown(f"### 📖 Karta obiektu: {wybrana_roslina} ({dane.get('typ', 'Roślina')})")
     
-    if roslina_b == "Aksamitka" or roslina_a == "Aksamitka":
-        st.success(f"💚 **WYBITNIE KORZYSTNE POŁĄCZENIE!**\n\n🛡️ Ochronny superbohater! Korzenie aksamitki wydzielają substancje niszczące nicienie glebowe, oczyszczając całe podłoże wokół sąsiada. Intensywny zapach dezorientuje mszyce, mączliki oraz śmietki.")
-    elif roslina_b in dane_a["korzystne"]:
-        st.success(f"💚 **KORZYSTNE SĄSIEDZTWO (Zgodne z tabelą X)!**\n\nTe rośliny doskonale rosną obok siebie. Wykorzystują inne warstwy gleby lub wzajemnie odstraszają swoje szkodniki.")
-    elif roslina_b in dane_a["niekorzystne"]:
-        st.error(f"❌ **NIEKORZYSTNE SĄSIEDZTWO!**\n\nUnikaj tego połączenia. Rośliny mogą konkurować o te same składniki pokarmowe, wodę lub są podatne na te same choroby (np. zaraza u pomidora i ziemniaka).")
-    else:
-        st.warning(f"🟡 **STOSUNEK NEUTRALNY.**\n\nRośliny tolerują się wzajemnie na grządce. Nie wpływają negatywnie ani pozytywnie na swój rozwój.")
-        
-    with st.expander(f"📋 Zobacz pełne wymagania i wskazówki dla: {roslina_a}"):
-        st.write(f"• **Odczyn pH gleby:** {dane_a['ph']}")
-        st.write(f"• **Wymagane oświetlenie:** {dane_a['swiatlo']}")
-        st.write(f"• **Zapotrzebowanie na wodę:** {dane_a['woda']}")
-        st.write(f"• **Typ podłoża:** {dane_a['gleba']}")
-        st.info(f"💡 **Eko-porada z Grządkowiska:** {dane_a['porada']}")
+    with st.container():
+        col1, col2 = st.columns(2)
+        with col1:
+            st.write(f"**🧪 Wymagane pH gleby:** {dane['ph']}")
+            st.write(f"**☀️ Stanowisko / Światło:** {dane['swiatlo']}")
+        with col2:
+            st.write(f"**💧 Zapotrzebowanie na wodę:** {dane['woda']}")
+            st.write(f"**🌱 Preferowany rodzaj gleby:** {dane['gleba']}")
+            
+    st.info(f"💡 **Porada eksperta i uprawa:** {dane['porada']}")
+    
+    # Sąsiedztwo i partnerstwo roślin
+    col_k, col_nk = st.columns(2)
+    with col_k:
+        st.success("👍 **Dobre sąsiedztwo / Dobre pary:**\n\n" + ", ".join(dane["korzystne"]) if dane["korzystne"] else "Brak szczególnych partnerów")
+    with col_nk:
+        st.error("👎 **Złe sąsiedztwo (Unikać):**\n\n" + ", ".join(dane["niekorzystne"]) if dane["niekorzystne"] else "Brak wyraźnych wrogów")
