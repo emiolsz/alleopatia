@@ -147,35 +147,53 @@ st.sidebar.html(f"""
         </div>
     </div>
 """)
+ 
+# ==========================================
+# 3. LOGIKA: POGODA DLA TWOJEJ MIEJSCOWOŚCI
+# ==========================================
+st.sidebar.html("""<h3 style="color: #ffffff !important; margin-top: 5px; margin-bottom: 5px; font-size: 1.3rem; font-family: Arial, sans-serif;">🌤️ Pogoda Lokalna</h3>""")
 
-# ==========================================
-# 3. LOGIKA: DANE METEOROLOGICZNE IMGW API
-# ==========================================
-@st.cache_data(ttl=3600)
-def pobierz_pogode_imgw():
+# Pole tekstowe do wpisania lokalizacji przez działkowicza
+lokalizacja = st.sidebar.text_input("📍 Wpisz swoją miejscowość / wieś:", value="Warszawa")
+
+@st.cache_data(ttl=1800)
+def pobierz_pogode_lokalna(miasto):
     try:
-        url = "https://imgw.pl"
-        odpowiedz = requests.get(url, timeout=5)
-        if odpowiedz.status_code == 200:
-            return odpowiedz.json()
+        # 1. Geokodowanie - zamiana nazwy miejscowości na współrzędne geograficzne
+        geo_url = f"https://open-meteo.com{miasto}&count=1&language=pl&format=json"
+        geo_res = requests.get(geo_url, timeout=5).json()
+        
+        if not geo_res.get("results"):
+            return None
+            
+        lat = geo_res["results"][0]["latitude"]
+        lon = geo_res["results"][0]["longitude"]
+        nazwa_pelna = geo_res["results"][0]["name"]
+        
+        # 2. Pobieranie dokładnych danych meteo dla tych współrzędnych
+        weather_url = f"https://open-meteo.com{lat}&longitude={lon}&current=temperature_2m,relative_humidity_2m,precipitation&timezone=auto"
+        w_res = requests.get(weather_url, timeout=5).json()
+        
+        current = w_res["current"]
+        return {
+            "miasto": nazwa_pelna,
+            "temp": float(current["temperature_2m"]),
+            "wilgotnosc": float(current["relative_humidity_2m"]),
+            "opad": float(current["precipitation"])
+        }
     except:
         return None
 
-dane_pogodowe = pobierz_pogode_imgw()
-
-st.sidebar.html("""<h3 style="color: #ffffff; margin-top: 5px; margin-bottom: 10px; font-size: 1.3rem; font-family: Arial, sans-serif;">🌤️ Pogoda dla Polski (IMGW)</h3>""")
+dane_pogodowe = pobierz_pogode_lokalna(lokalizacja)
 
 if dane_pogodowe:
-    stacje = [stacja['stacja'] for stacja in dane_pogodowe]
-    wybrane_miasto = st.sidebar.selectbox("Wybierz stację pomiarową:", sorted(stacje), label_visibility="collapsed")
-    dane_stacji = next(item for item in dane_pogodowe if item["stacja"] == wybrane_miasto)
-    
-    temp = float(dane_stacji['temperatura'])
-    opad = float(dane_stacji['suma_opadu'])
-    wilgotnosc = float(dane_stacji.get('wilgotnosc_wzgledna', 0))
+    temp = dane_pogodowe["temp"]
+    opad = dane_pogodowe["opad"]
+    wilgotnosc = dane_pogodowe["wilgotnosc"]
     
     st.sidebar.html(f"""
-        <div style="display: flex; justify-content: space-between; margin-top: 10px; font-family: Arial, sans-serif; text-align: center;">
+        <p style="color: #d0e1cd !important; font-size: 0.85rem; margin: 0 0 10px 0; font-family: Arial, sans-serif;">Wyniki dla: <b>{dane_pogodowe['miasto']}</b></p>
+        <div style="display: flex; justify-content: space-between; font-family: Arial, sans-serif; text-align: center;">
             <div style="background: rgba(255,255,255,0.08); padding: 8px; border-radius: 6px; width: 30%;">
                 <span style="font-size: 0.75rem; color: #ccc; display: block;">Temp.</span>
                 <span style="font-size: 1.1rem; font-weight: bold; color: #fff;">{temp} °C</span>
@@ -190,6 +208,8 @@ if dane_pogodowe:
             </div>
         </div>
     """)
+    
+    # Wykrywanie przymrozków, mgły i szadzi
     zjawiska = []
     if temp < 2.0: zjawiska.append("❄️ Przymrozek")
     if wilgotnosc > 95.0 and temp > 0: zjawiska.append("🌫️ Mgła")
@@ -208,7 +228,7 @@ if dane_pogodowe:
     else:
         st.sidebar.success("🌱 Warunki stabilne.")
 else:
-    st.sidebar.html("<p style='color:#ffaa00; font-size:0.85rem; margin-top:10px; font-family:Arial,sans-serif;'>⚠️ Nie udało się załadować danych meteo.</p>")
+    st.sidebar.html("<p style='color:#ffaa00; font-size:0.85rem; margin-top:10px; font-family:Arial,sans-serif;'>⚠️ Nie znaleziono miejscowości lub błąd pobierania.</p>")
 
 
 # ==========================================
@@ -244,7 +264,8 @@ else:
 
 
 # ==========================================
-# 5. MIEJSCE NA STOPKĘ AUTORSKĄ I DEDYKACJĘ
+# 5. MIEJSCE NA STOPKĘ AUTORSKĄ I DEDYKACJĘ 
+aplikację zaprojektowano 20-22 maja 2026
 # ==========================================
 st.sidebar.markdown("<br><br>", unsafe_allow_html=True)
 st.sidebar.markdown("---")
@@ -260,7 +281,7 @@ st.sidebar.html("""
             Projekt i wykonanie: <span style="color: #ffffff; font-weight: bold;">Emilia Olszewska</span>
         </p>
         <p style="margin: 4px 0 0 0; font-size: 0.68rem; color: #8cb388;">
-            © 22 maja 2026 Grządkowisko 🥕🌸🍃🍎 Wszelkie prawa zastrzeżone ·
+        © 2026 Grządkowisko 🥕🌸🍃🍎 Wszelkie prawa zastrzeżone
         </p>
     </div>
 """)
