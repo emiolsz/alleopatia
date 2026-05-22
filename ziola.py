@@ -9,6 +9,12 @@ ziola_baza = {
         "porada": "Intensywny cytrynowy zapach silnie wabi pszczoły, poprawiając zapylanie sąsiadujących warzyw. Sadź w narożnikach grządek pomidorów.",
         "korzystne": ["Pomidor", "Ogórek", "Drzewa owocowe"], "niekorzystne": ["Brak"]
     },
+        "Bazylia": {
+        "typ": "Zioło Wspierające", "ph": "6.0 - 7.0", "swiatlo": "Pełne słońce, osłonięte", "woda": "Regularne (nie przelewać)", "gleba": "Żyzna, przepuszczalna, próchnicza",
+        "porada": "Doskonały partner dla pomidorów – poprawia ich smak i intensywny aromat, a zapach bazylii skutecznie odstrasza mączliki oraz komary. Uszczykuj czubki, aby ładnie się krzewiła.",
+        "korzystne": ["Pomidor", "Ogórek", "Cukinia", "Aksamitka"], "niekorzystne": ["Szałwia", "Majeranek"]
+    },
+
     "Pokrzywa zwyczajna": {
         "typ": "Zioło Wspierające", "ph": "6.0 - 7.0", "swiatlo": "Półcień", "woda": "Średnie", "gleba": "Bardzo bogata w azot",
         "porada": "Kontrolowana kępa w ogrodzie zwiększa produkcję olejków eterycznych w ziołach i warzywach rosnących obok. Genialny surowiec na gnojówki wzmacniające.",
