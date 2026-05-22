@@ -174,7 +174,7 @@ miasto = st.sidebar.text_input("Wpisz swoją miejscowość / miasto:", value="Wa
 @st.cache_data(ttl=3600)
 def pobierz_wspolrzedne_miasta(nazwa_miasta):
     try:
-        url_geo = f"https://open-meteo.com{nazwa_miasta}&count=1&language=pl&format=json"
+        url_geo = "https://" + "geocoding-api.open-meteo.com" + "/v1/search?name=" + f"{nazwa_miasta}&count=1&language=pl&format=json"
         odpowiedz = requests.get(url_geo, timeout=5)
         if odpowiedz.status_code == 200:
             dane = odpowiedz.json()
