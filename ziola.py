@@ -1,4 +1,4 @@
-baza_ziol = {
+ziola_baza = {
     "Tymianek": {
         "typ": "Zioło Wspierające", "ph": "6.5 - 7.5", "swiatlo": "Pełne słońce (Południe)", "woda": "Bardzo niskie", "gleba": "Sucha, piaszczysto-gliniasta",
         "porada": "Odstrasza ślimaki nagie oraz gąsienice bielinka. Sadź na słonecznych obrzeżach grządek z kapustą i sałatą.",
