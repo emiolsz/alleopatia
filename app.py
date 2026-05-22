@@ -162,17 +162,22 @@ st.sidebar.html(f"""
             <p style="margin: 0; font-size: 0.88rem; line-height: 1.4; color: #ffffff;"><b>Wytyczne:</b> {faza_porada}</p>
         </div>
     </div>
-""")
+""")    
+
 # ==========================================
-# 3. LOGIKA: DANE METEOROLOGICZNE IMGW API (POPRAWIONE)
+# 3. LOGIKA: DANE METEOROLOGICZNE OPEN-METEO API
 # ==========================================
-st.sidebar.html("""h3 style="color: #ffffff !important; margin-top: 15px; margin-bottom: 5px; font-size: 1.2rem; font-family: Arial, sans-serif;">🌤️ Pogoda IMGW</h3>""")
+st.sidebar.html("""<h3 style="color: #ffffff !important; margin-top: 15px; margin-bottom: 5px; font-size: 1.2rem; font-family: Arial, sans-serif;">🌤️ Pogoda Open-Meteo</h3>""")
+
+# Pola do wpisania lokalizacji w panelu bocznym
+szerokosc = st.sidebar.number_input("Szerokość geogr. (Latitude):", value=52.2297, format="%.4f")
+dlugosc = st.sidebar.number_input("Długość geogr. (Longitude):", value=21.0122, format="%.4f")
 
 @st.cache_data(ttl=600)
-def pobierz_pogode_imgw():
+def pobierz_pogode_open_meteo(lat, lon):
     try:
-        # Oficjalne i publiczne API IMGW z danymi synoptycznymi
-        url = "https://imgw.pl"
+        # Oficjalne i darmowe API Open-Meteo
+        url = f"https://open-meteo.com{lat}&longitude={lon}&current=temperature_2m,relative_humidity_2m,rain,precipitation,pressure_msl"
         odpowiedz = requests.get(url, timeout=5)
         if odpowiedz.status_code == 200:
             return odpowiedz.json()
@@ -180,44 +185,29 @@ def pobierz_pogode_imgw():
         return None
     return None
 
-dane_pogodowe = pobierz_pogode_imgw()
+dane_pogodowe = pobierz_pogode_open_meteo(szerokosc, dlugosc)
 
-if dane_pogodowe:
-    # Pobieramy nazwy stacji i sortujemy je alfabetycznie
-    stacje = sorted([stacja['stacja'] for stacja in dane_pogodowe])
+if dane_pogodowe and "current" in dane_pogodowe:
+    biezace = dane_pogodowe["current"]
     
-    # Ustawianie domyślnego miasta (np. Warszawa)
-    domyslny_indeks = 0
-    for i, s in enumerate(stacje):
-        if "warszawa" in s.lower():
-            domyslny_indeks = i
-            break
-            
-    wybrane_miasto = st.sidebar.selectbox("Wybierz stację:", stacje, index=domyslny_indeks, label_visibility="collapsed")
-    
-    # Wyciąganie danych dla wybranego miasta
-    dane_stacji = next(item for item in dane_pogodowe if item["stacja"] == wybrane_miasto)
-    
-    # API IMGW zwraca wartości jako stringi lub None, warto zabezpieczyć wyświetlanie
-    temp = dane_stacji.get('temperatura', '0')
-    opad = dane_stacji.get('suma_opadu', '0')
-    wilgotnosc = dane_stacji.get('wilgotnosc_wzgledna', '0')
-    cisnienie = dane_stacji.get('cisnienie', 'Brak danych')
-    if cisnienie is None:
-        cisnienie = "Brak danych"
+    # Wyciągamy precyzyjne dane zwrócone przez serwer
+    temp = biezace.get('temperature_2m', '0')
+    opad = biezace.get('precipitation', '0')
+    wilgotnosc = biezace.get('relative_humidity_2m', '0')
+    cisnienie = biezace.get('pressure_msl', 'Brak danych')
     
     st.sidebar.html(f"""
         <div class="sidebar-card" style="background: rgba(0, 0, 0, 0.15); padding: 14px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.1); margin-bottom: 15px;">
             <div style="font-size: 1.5rem; font-weight: bold; color: #ffffff; margin-bottom: 5px;">{temp}°C</div>
             <p style="margin: 3px 0; font-size: 0.88rem; color: #E2EFE5;">💧 <b>Wilgotność:</b> {wilgotnosc}%</p>
-            <p style="margin: 3px 0; font-size: 0.88rem; color: #E2EFE5;">🌧️ <b>Suma opadu:</b> {opad} mm</p>
+            <p style="margin: 3px 0; font-size: 0.88rem; color: #E2EFE5;">🌧️ <b>Opady:</b> {opad} mm</p>
             <p style="margin: 3px 0; font-size: 0.88rem; color: #E2EFE5;">📉 <b>Ciśnienie:</b> {cisnienie} hPa</p>
         </div>
     """)
 else:
     st.sidebar.html("""
         <div class="sidebar-card" style="background: rgba(255, 0, 0, 0.1); border-left: 3px solid #ff4b4b; padding: 14px; border-radius: 10px; margin-bottom: 15px;">
-            <p style="margin: 0; font-size: 0.88rem; color: #ff8f8f;">⚠️ Nie udało się pobrać aktualnych danych pogodowych IMGW.</p>
+            <p style="margin: 0; font-size: 0.88rem; color: #ff8f8f;">⚠️ Nie udało się pobrać aktualnych danych z Open-Meteo.</p>
         </div>
     """)
 
