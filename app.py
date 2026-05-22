@@ -274,7 +274,7 @@ st.sidebar.html("""
 <div style="text-align: center; font-family: Arial, sans-serif; background-color: #1e3d19 !important; padding: 10px 0; width: 100%;">
     <!-- Dedykacja -->
     <p style="font-style: italic; color: #d0e1cd; font-size: 0.82rem; line-height: 1.5; margin: 0 0 25px 0;">
-        ❤️ „Aplikację dedykuję Mojemu Tacie, babci Helence i przyjaciółce Dorotce, a także tym którzy kochają swoje grządeczki z serdecznością”
+        🌿 „Aplikację dedykuję Mojemu Tacie, babci Helence i przyjaciółce Dorotce, a także tym którzy kochają swoje grządeczki z serdecznością”
     </p>
     
     <!-- Mała, wyśrodkowana nota autorska i prawna -->
@@ -282,7 +282,8 @@ st.sidebar.html("""
         Projekt i wykonanie: <span style="color: #ffffff; font-weight: bold;">Emilia Olszewska</span>
     </p>
     <p style="margin: 4px 0 0 0; font-size: 0.68rem; color: #8cb388;">
-        © 2026 Grządkowisko 🥕🌸🍃🍎 Wszelkie prawa zastrzeżone
+        © 2026 Grządkowisko 🥕🌸🍃🍎
+        Wszelkie prawa zastrzeżone
     </p>
 </div>
 """)
