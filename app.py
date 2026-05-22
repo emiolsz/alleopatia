@@ -55,9 +55,9 @@ st.markdown("""
         background-attachment: fixed;
     }
     
-    /* Karty z encyklopedii - czysta biel z lekkim cieniem */
-    .stSelectbox, div[data-testid="stVerticalBlock"] > div.stContainer {
-        background-color: #ffffff;
+    /* POPRAWKA: Białe tło wyłącznie dla kart na głównej stronie (nie dotyczy paska bocznego) */
+    .main div[data-testid="stContainer"] {
+        background-color: #ffffff !important;
         padding: 24px;
         border-radius: 12px;
         box-shadow: 0px 4px 20px rgba(46, 90, 39, 0.06);
@@ -67,7 +67,7 @@ st.markdown("""
     h1 {color: #1e3d19; font-family: 'Arial', sans-serif; font-weight: bold;}
     h3 {color: #2e5a27; font-family: 'Arial', sans-serif;}
     
-    /* Panel boczny: ciemnozielony + białe litery */
+    /* Panel boczny: ciemnozielony */
     section[data-testid="stSidebar"] {
         background-color: #1e3d19 !important;
     }
