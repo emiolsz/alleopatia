@@ -107,7 +107,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-
+  
 # ==========================================
 # 2. LOGIKA: KALENDARZ (DATA, DZIEŃ, IMIENINY) i KSIĘŻYC
 # ==========================================
@@ -125,13 +125,13 @@ def pobierz_faze_ksiezyca():
     faza = jd - int(jd)
     
     if faza < 0.03 or faza > 0.97:
-        return "🌑 Nów", "Dni Korzenia. Czas na walkę ze szkodnikami, plewienie i przycinanie pędów. Nie siejemy!"
+        return "🌑 Nów", "Dni 🥕 Korzenia. Czas na walkę ze szkodnikami, plewienie i przycinanie pędów. Nie siejemy!"
     elif faza < 0.47:
-        return "🌓 Pierwsza kwadra", "Dni Liścia i Kwiatu. Soki idą w górę. Świetny moment na siew sałaty, ziół i rozsad."
+        return "🌓 Pierwsza kwadra", "Dni 🍃 Liścia i 🌸 Kwiatu. Soki idą w górę. Świetny moment na siew sałaty, ziół i rozsad."
     elif faza < 0.53:
-        return "🌕 Pełnia", "Dni Owocu. Ziemia odpoczywa. Idealny czas na nawożenie (gnojówki) i zbiory do natychmiastowego spożycia."
+        return "🌕 Pełnia", "Dni 🍎 Owocu. Ziemia odpoczywa. Idealny czas na nawożenie (gnojówki) i zbiory do natychmiastowego spożycia."
     else:
-        return "🌗 Ostatnia kwadra", "Dni Korzenia. Soki schodzą w dół. Najlepszy czas na siew marchewki, pietruszki, rzodkiewki."
+        return "🌗 Ostatnia kwadra", "Dni 🥕 Korzenia. Soki schodzą w dół. Najlepszy czas na siew marchewki, pietruszki, rzodkiewki."
 
 baza_imienin = {
     1: {1: "Mieszka, Mieczysława", 2: "Makarego, Bazylego", 22: "Wincentego, Anastazego"},
@@ -168,7 +168,7 @@ st.sidebar.markdown(f"**Data:** {pelna_data}\n\n**Dzień roku:** {dzien_roku}/36
 
 faza_nazwa, faza_porada = pobierz_faze_ksiezyca()
 st.sidebar.markdown(f"### 🌙 Kalendarz Księżycowy")
-st.sidebar.info(f"**Dzisiejsza faza:** {faza_nazwa}\n\n*Wytyczne:* {faza_porada}")
+st.sidebar.info(f"**Dzisiejsza faza:** {faza_nazwa}\n\n**Wytyczne:** {faza_porada}")
 
 
 # ==========================================
@@ -257,17 +257,18 @@ if baza_roslin:
 else:
     st.info("Dodaj bazy danych na GitHubie (`warzywa.py`, `krzewy.py`, `ziola.py`, `kwiaty.py`, `drzewa.py`), aby encyklopedia zaczęła działać.")
 
+
 # ==========================================
 # 5. MIEJSCE NA STOPKĘ AUTORSKĄ I DEDYKACJĘ
 # ==========================================
 st.sidebar.markdown("---")
 
 st.sidebar.markdown("""
-    <div style='background-color: rgba(255,255,255,0.08); padding: 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); margin-top: 10px;'>
-        <p style='margin: 0; font-size: 0.8rem; color: #ccc; font-weight: bold;'>✍ *Projekt i wykonanie:*</p>
-        <p style='margin: 3px 0 10px 0; font-size: 1.1rem; color: #ffffff; font-weight: bold;'>Emilia Olszewska</p>
-        <p style='margin: 0; font-size: 0.75rem; color: #bbb;'>© mai 2026 Grządkowisko</p>
-        <p style='margin: 0; font-size: 0.72rem; color: #999; font-style: italic;'>maj 2026 Wszelkie prawa zastrzeżone.</p>
+    <div style='background-color: rgba(255,255,255,0.08); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); margin-top: 10px; text-align: center;'>
+        <p style='margin: 0; font-size: 0.78rem; color: #ccc;'>✍ Projekt i wykonanie:</p>
+        <p style='margin: 3px 0 6px 0; font-size: 0.85rem; color: #ffffff; font-weight: bold;'> Emilia Olszewska </p>
+        <p style='margin: 0; font-size: 0.72rem; color: #bbb;'>© maj 2026 Grządkowisko</p>
+        <p style='margin: 0; font-size: 0.70rem; color: #999; font-style: italic;'>Wszelkie prawa zastrzeżone.</p>
     </div>
     
     <div style='margin-top: 20px; padding: 0 5px; text-align: center;'>
