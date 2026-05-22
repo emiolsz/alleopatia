@@ -165,19 +165,31 @@ st.sidebar.html(f"""
 """)    
 
 # ==========================================
-# 3. LOGIKA: DANE METEOROLOGICZNE OPEN-METEO API
+# 3. LOGIKA: AUTOMATYCZNE PYTANIE O LOKALIZACJĘ (GPS) I POGODA
 # ==========================================
-st.sidebar.html("""<h3 style="color: #ffffff !important; margin-top: 15px; margin-bottom: 5px; font-size: 1.2rem; font-family: Arial, sans-serif;">🌤️ Pogoda Open-Meteo</h3>""")
+from streamlit_js_eval import streamlit_js_eval
 
-# Pola do wpisania lokalizacji w panelu bocznym
-szerokosc = st.sidebar.number_input("Szerokość geogr. (Latitude):", value=52.2297, format="%.4f")
-dlugosc = st.sidebar.number_input("Długość geogr. (Longitude):", value=21.0122, format="%.4f")
+st.sidebar.html("""<h3 style="color: #ffffff !important; margin-top: 15px; margin-bottom: 5px; font-size: 1.2rem; font-family: Arial, sans-serif;">🌤️ Pogoda dla Twojej lokalizacji</h3>""")
+
+# Ta linijka automatycznie wywołuje w przeglądarce pytanie: "Czy udostępnić lokalizację?"
+pozycja_gps = streamlit_js_eval(component='get_geolocation', key='automatyczny_gps_pogoda')
+
+# Domyślne współrzędne (np. Warszawa), jeśli ktoś odrzuci pytanie o GPS
+szerokosc = 52.2300
+dlugosc = 21.0100
+
+# Jeśli użytkownik kliknie "Zezwól", aplikacja nadpisze współrzędne jego pozycją
+if pozycja_gps and 'coords' in pozycja_gps:
+    szerokosc = pozycja_gps['coords']['latitude']
+    dlugosc = pozycja_gps['coords']['longitude']
+    st.sidebar.caption("📍 Pogoda dopasowana automatycznie na podstawie Twojego GPS.")
+else:
+    st.sidebar.caption("🤖 Brak dostępu do GPS. Wyświetlam domyślną pogodę (Warszawa). Zaakceptuj komunikat o lokalizacji w przeglądarce.")
 
 @st.cache_data(ttl=600)
 def pobierz_pogode_open_meteo(lat, lon):
     try:
-        # Oficjalne i darmowe API Open-Meteo
-        url = f"https://open-meteo.com{lat}&longitude={lon}&current=temperature_2m,relative_humidity_2m,rain,precipitation,pressure_msl"
+        url = f"https://open-meteo.com{lat:.4f}&longitude={lon:.4f}&current=temperature_2m,relative_humidity_2m,precipitation,surface_pressure"
         odpowiedz = requests.get(url, timeout=5)
         if odpowiedz.status_code == 200:
             return odpowiedz.json()
@@ -189,25 +201,23 @@ dane_pogodowe = pobierz_pogode_open_meteo(szerokosc, dlugosc)
 
 if dane_pogodowe and "current" in dane_pogodowe:
     biezace = dane_pogodowe["current"]
-    
-    # Wyciągamy precyzyjne dane zwrócone przez serwer
-    temp = biezace.get('temperature_2m', '0')
-    opad = biezace.get('precipitation', '0')
-    wilgotnosc = biezace.get('relative_humidity_2m', '0')
-    cisnienie = biezace.get('pressure_msl', 'Brak danych')
+    temp = biezace.get('temperature_2m', 0)
+    opad = biezace.get('precipitation', 0)
+    wilgotnosc = biezace.get('relative_humidity_2m', 0)
+    cisnienie = biezace.get('surface_pressure', 1013)
     
     st.sidebar.html(f"""
         <div class="sidebar-card" style="background: rgba(0, 0, 0, 0.15); padding: 14px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.1); margin-bottom: 15px;">
             <div style="font-size: 1.5rem; font-weight: bold; color: #ffffff; margin-bottom: 5px;">{temp}°C</div>
             <p style="margin: 3px 0; font-size: 0.88rem; color: #E2EFE5;">💧 <b>Wilgotność:</b> {wilgotnosc}%</p>
             <p style="margin: 3px 0; font-size: 0.88rem; color: #E2EFE5;">🌧️ <b>Opady:</b> {opad} mm</p>
-            <p style="margin: 3px 0; font-size: 0.88rem; color: #E2EFE5;">📉 <b>Ciśnienie:</b> {cisnienie} hPa</p>
+            <p style="margin: 3px 0; font-size: 0.88rem; color: #E2EFE5;">📉 <b>Ciśnienie:</b> {int(cisnienie)} hPa</p>
         </div>
     """)
 else:
     st.sidebar.html("""
         <div class="sidebar-card" style="background: rgba(255, 0, 0, 0.1); border-left: 3px solid #ff4b4b; padding: 14px; border-radius: 10px; margin-bottom: 15px;">
-            <p style="margin: 0; font-size: 0.88rem; color: #ff8f8f;">⚠️ Nie udało się pobrać aktualnych danych z Open-Meteo.</p>
+            <p style="margin: 0; font-size: 0.88rem; color: #ff8f8f;">⚠️ Nie udało się automatycznie pobrać danych pogodowych.</p>
         </div>
     """)
 
