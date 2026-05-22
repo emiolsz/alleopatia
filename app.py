@@ -149,51 +149,34 @@ st.sidebar.html(f"""
 """)
  
 # ==========================================
-# 3. LOGIKA: POGODA DLA TWOJEJ MIEJSCOWOŚCI
+# 3. LOGIKA: DANE METEOROLOGICZNE IMGW API
 # ==========================================
-st.sidebar.html("""<h3 style="color: #ffffff !important; margin-top: 5px; margin-bottom: 5px; font-size: 1.3rem; font-family: Arial, sans-serif;">🌤️ Pogoda Lokalna</h3>""")
-
-# Pole tekstowe do wpisania lokalizacji przez działkowicza
-lokalizacja = st.sidebar.text_input("📍 Wpisz swoją miejscowość / wieś:", value="Warszawa")
+st.sidebar.html("""<h3 style="color: #ffffff !important; margin-top: 15px; margin-bottom: 10px; font-size: 1.3rem; font-family: Arial, sans-serif;">🌤️ Pogoda dla Polski (IMGW)</h3>""")
 
 @st.cache_data(ttl=1800)
-def pobierz_pogode_lokalna(miasto):
+def pobierz_pogode_imgw():
     try:
-        # 1. Geokodowanie - zamiana nazwy miejscowości na współrzędne geograficzne
-        geo_url = f"https://open-meteo.com{miasto}&count=1&language=pl&format=json"
-        geo_res = requests.get(geo_url, timeout=5).json()
-        
-        if not geo_res.get("results"):
-            return None
-            
-        lat = geo_res["results"][0]["latitude"]
-        lon = geo_res["results"][0]["longitude"]
-        nazwa_pelna = geo_res["results"][0]["name"]
-        
-        # 2. Pobieranie dokładnych danych meteo dla tych współrzędnych
-        weather_url = f"https://open-meteo.com{lat}&longitude={lon}&current=temperature_2m,relative_humidity_2m,precipitation&timezone=auto"
-        w_res = requests.get(weather_url, timeout=5).json()
-        
-        current = w_res["current"]
-        return {
-            "miasto": nazwa_pelna,
-            "temp": float(current["temperature_2m"]),
-            "wilgotnosc": float(current["relative_humidity_2m"]),
-            "opad": float(current["precipitation"])
-        }
+        url = "https://imgw.pl"
+        odpowiedz = requests.get(url, timeout=5)
+        if odpowiedz.status_code == 200:
+            return odpowiedz.json()
     except:
         return None
 
-dane_pogodowe = pobierz_pogode_lokalna(lokalizacja)
+dane_pogodowe = pobierz_pogode_imgw()
 
 if dane_pogodowe:
-    temp = dane_pogodowe["temp"]
-    opad = dane_pogodowe["opad"]
-    wilgotnosc = dane_pogodowe["wilgotnosc"]
+    stacje = [stacja['stacja'] for stacja in dane_pogodowe]
+    wybrane_miasto = st.sidebar.selectbox("Wybierz stację pomiarową:", sorted(stacje))
+    dane_stacji = next(item for item in dane_pogodowe if item["stacja"] == wybrane_miasto)
     
+    temp = float(dane_stacji['temperatura'])
+    opad = float(dane_stacji['suma_opadu'])
+    wilgotnosc = float(dane_stacji.get('wilgotnosc_wzgledna', 0))
+    
+    # Renderowanie trzech metryk obok siebie na ciemnozielonym tle
     st.sidebar.html(f"""
-        <p style="color: #d0e1cd !important; font-size: 0.85rem; margin: 0 0 10px 0; font-family: Arial, sans-serif;">Wyniki dla: <b>{dane_pogodowe['miasto']}</b></p>
-        <div style="display: flex; justify-content: space-between; font-family: Arial, sans-serif; text-align: center;">
+        <div style="display: flex; justify-content: space-between; margin-top: 10px; margin-bottom: 15px; font-family: Arial, sans-serif; text-align: center;">
             <div style="background: rgba(255,255,255,0.08); padding: 8px; border-radius: 6px; width: 30%;">
                 <span style="font-size: 0.75rem; color: #ccc; display: block;">Temp.</span>
                 <span style="font-size: 1.1rem; font-weight: bold; color: #fff;">{temp} °C</span>
@@ -209,7 +192,7 @@ if dane_pogodowe:
         </div>
     """)
     
-    # Wykrywanie przymrozków, mgły i szadzi
+    # Wykrywanie zjawisk niebezpiecznych
     zjawiska = []
     if temp < 2.0: zjawiska.append("❄️ Przymrozek")
     if wilgotnosc > 95.0 and temp > 0: zjawiska.append("🌫️ Mgła")
@@ -217,18 +200,19 @@ if dane_pogodowe:
     
     if zjawiska:
         badges_html = "".join([f"<span style='background:#ff4b4b; color:white; padding:3px 6px; border-radius:4px; font-size:0.75rem; font-weight:bold; margin-right:5px; display:inline-block;'>{z}</span>" for z in zjawiska])
-        st.sidebar.html(f"<div style='margin-top:12px; font-family:Arial,sans-serif; color:white;'><span style='font-size:0.85rem; display:block; margin-bottom:5px;'><b>Wykryte zjawiska:</b></span>{badges_html}</div>")
+        st.sidebar.html(f"<div style='margin-top:12px; margin-bottom:12px; font-family:Arial,sans-serif; color:white;'><span style='font-size:0.85rem; display:block; margin-bottom:5px;'><b>Wykryte zjawiska:</b></span>{badges_html}</div>")
     else:
-        st.sidebar.html("<p style='color:#bbb; font-size:0.8rem; font-style:italic; margin-top:10px; font-family:Arial,sans-serif;'>Brak niebezpiecznych zjawisk.</p>")
+        st.sidebar.html("<p style='color:#bbb; font-size:0.8rem; font-style:italic; margin-top:10px; margin-bottom:12px; font-family:Arial,sans-serif;'>Brak niebezpiecznych zjawisk.</p>")
         
     if temp < 4.0:
-        st.sidebar.error("⚠️ Ryzyko przymrozku!")
+        st.sidebar.error("⚠️ Ryzyko przymrozku! Chroń wrażliwe rozsady agrowłókniną.")
     elif temp > 25.0 and opad == 0:
-        st.sidebar.warning("💧 Susza!")
+        st.sidebar.warning("💧 Susza! Pamiętaj o obfitym podlewaniu wcześnie rano.")
     else:
-        st.sidebar.success("🌱 Warunki stabilne.")
+        st.sidebar.success("🌱 Warunki stabilne dla wzrostu roślin.")
 else:
-    st.sidebar.html("<p style='color:#ffaa00; font-size:0.85rem; margin-top:10px; font-family:Arial,sans-serif;'>⚠️ Nie znaleziono miejscowości lub błąd pobierania.</p>")
+    # Bezpieczny komunikat rezerwowy na wypadek przerw technicznych serwerów państwowych
+    st.sidebar.info("🌱 Serwer IMGW chwilowo nie odpowiada. Pamiętaj o ogólnej zasadzie: podlewaj obficie w ciepłe dni wcześnie rano!")
 
 
 # ==========================================
