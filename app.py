@@ -165,26 +165,29 @@ st.sidebar.html(f"""
 """)    
 
 # ==========================================
-# 3. LOGIKA: AUTOMATYCZNE PYTANIE O LOKALIZACJĘ (GPS) I POGODA
+# 3. LOGIKA: DANE METEOROLOGICZNE - AUTOMATYCZNA LOKALIZACJA (OPEN-METEO)
 # ==========================================
-from streamlit_js_eval import streamlit_js_eval
+st.sidebar.html("""<h3 style="color: #ffffff !important; margin-top: 15px; margin-bottom: 5px; font-size: 1.2rem; font-family: Arial, sans-serif;">🌤️ Pogoda w Twoim ogrodzie</h3>""")
 
-st.sidebar.html("""<h3 style="color: #ffffff !important; margin-top: 15px; margin-bottom: 5px; font-size: 1.2rem; font-family: Arial, sans-serif;">🌤️ Pogoda dla Twojej lokalizacji</h3>""")
+# Całkowicie natywne i bezpieczne pole tekstowe Streamlit
+miasto = st.sidebar.text_input("Wpisz swoją miejscowość / miasto:", value="Warszawa")
 
-# Ta linijka automatycznie wywołuje w przeglądarce pytanie: "Czy udostępnić lokalizację?"
-pozycja_gps = streamlit_js_eval(component='get_geolocation', key='automatyczny_gps_pogoda')
+@st.cache_data(ttl=3600)
+def pobierz_wspolrzedne_miasta(nazwa_miasta):
+    try:
+        # Darmowe i szybkie API geokodowania Open-Meteo (zamienia tekst na współrzędne)
+        url_geo = f"https://open-meteo.com{nazwa_miasta}&count=1&language=pl&format=json"
+        odpowiedz = requests.get(url_geo, timeout=5)
+        if odpowiedz.status_code == 200 and "results" in odpowiedz.json():
+            wynik = odpowiedz.json()["results"][0]
+            return wynik.get("latitude"), wynik.get("longitude"), wynik.get("name", nazwa_miasta)
+    except:
+        pass
+    return 52.2300, 21.0100, "Warszawa (Domyślnie)"
 
-# Domyślne współrzędne (np. Warszawa), jeśli ktoś odrzuci pytanie o GPS
-szerokosc = 52.2300
-dlugosc = 21.0100
-
-# Jeśli użytkownik kliknie "Zezwól", aplikacja nadpisze współrzędne jego pozycją
-if pozycja_gps and 'coords' in pozycja_gps:
-    szerokosc = pozycja_gps['coords']['latitude']
-    dlugosc = pozycja_gps['coords']['longitude']
-    st.sidebar.caption("📍 Pogoda dopasowana automatycznie na podstawie Twojego GPS.")
-else:
-    st.sidebar.caption("🤖 Brak dostępu do GPS. Wyświetlam domyślną pogodę (Warszawa). Zaakceptuj komunikat o lokalizacji w przeglądarce.")
+# Pobieramy dynamicznie współrzędne na podstawie tego, co wpisał użytkownik
+szerokosc, dlugosc, nazwa_wyswietlana = pobierz_wspolrzedne_miasta(miasto)
+st.sidebar.caption(f"📍 Lokalizacja: {nazwa_wyswietlana} ({szerokosc:.2f}, {dlugosc:.2f})")
 
 @st.cache_data(ttl=600)
 def pobierz_pogode_open_meteo(lat, lon):
@@ -217,7 +220,7 @@ if dane_pogodowe and "current" in dane_pogodowe:
 else:
     st.sidebar.html("""
         <div class="sidebar-card" style="background: rgba(255, 0, 0, 0.1); border-left: 3px solid #ff4b4b; padding: 14px; border-radius: 10px; margin-bottom: 15px;">
-            <p style="margin: 0; font-size: 0.88rem; color: #ff8f8f;">⚠️ Nie udało się automatycznie pobrać danych pogodowych.</p>
+            <p style="margin: 0; font-size: 0.88rem; color: #ff8f8f;">⚠️ Nie udało się pobrać aktualnych danych pogodowych.</p>
         </div>
     """)
 
