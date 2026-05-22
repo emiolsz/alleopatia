@@ -227,97 +227,65 @@ st.sidebar.html("""
 """)
 
 # ==========================================
-# 5. PANEL GŁÓWNY: WYSZUKIWARKA ROŚLIN
+# 5. INTERFEJS UŻYTKOWNIKA (WYSZUKIWARKA ENCYKLOPEDII)
 # ==========================================
-st.markdown('<div class="geo-card">', unsafe_allow_html=True)
-st.markdown("### 🔍 Znajdź roślinę w swojej bazie")
-
-lista_roslin = sorted(list(baza_roslin.keys()))
-
-if lista_roslin:
-    wybrana_roslina = st.selectbox("Wybierz roślinę:", lista_roslin, label_visibility="collapsed")
+st.markdown("<br>", unsafe_allow_html=True)
+if baza_roslin:
+    wybrana_roslina = st.selectbox("🔍 Wybierz obiekt z encyklopedii:", list(baza_roslin.keys()))
     
     if wybrana_roslina:
         dane = baza_roslin[wybrana_roslina]
         
-        st.markdown(f"<h2 style='color: #1A3322; margin-top: 15px; margin-bottom: 15px;'>🌿 {str(wybrana_roslina).capitalize()}</h2>", unsafe_allow_html=True)
+        st.markdown(f"### 📖 Karta obiektu: {wybrana_roslina} ({dane.get('typ', 'Roślina')})")
         
-        col1, col2, col3 = st.columns(3)
-        with col1: st.metric(label="☀️ Stanowisko", value=dane.get('stanowisko', 'Brak danych'))
-        with col2: st.metric(label="💧 Podlewanie", value=dane.get('podlewanie', 'Brak danych'))
-        with col3: st.metric(label="🌱 Rozstawa", value=dane.get('rozstawa', 'Brak danych'))
-            
-        st.markdown(f"""
-            <div style="background-color: #F9FBF9; padding: 15px; border-radius: 10px; border-left: 4px solid #2D5237; margin-top: 25px;">
-                <h4 style="margin: 0 0 8px 0; color: #2D5237; font-weight: 600;">💡 Wskazówki i porady uprawowe:</h4>
-                <p style="margin: 0; color: #4A5D4E; font-size: 0.95rem; line-height: 1.5;">{dane.get('notatki', 'Brak dodatkowych uwag w bazie danych.')}</p>
-            </div>
-        """, unsafe_allow_html=True)
+        with st.container():
+            col1, col2 = st.columns(2)
+            with col1:
+                st.write(f"**🧪 Wymagane pH gleby:** {dane['ph']}")
+                st.write(f"**☀️ Stanowisko / Światło:** {dane['swiatlo']}")
+            with col2:
+                st.write(f"**💧 Zapotrzebowanie na wodę:** {dane['woda']}")
+                st.write(f"**🌱 Preferowany rodzaj gleby:** {dane['gleba']}")
+                
+        st.info(f"💡 **Porada eksperta i uprawa:** {dane['porada']}")
+        
+        col_k, col_nk = st.columns(2)
+        with col_k:
+            st.success("👍 **Dobre sąsiedztwo / Dobre pary:**\n\n" + ", ".join(dane["korzystne"]) if dane["korzystne"] else "Brak szczególnych partnerów")
+        with col_nk:
+            st.error("👎 **Złe sąsiedztwo (Unikać):**\n\n" + ", ".join(dane["niekorzystne"]) if dane["niekorzystne"] else "Brak wyraźnych wrogów")
 else:
-    st.info("Baza roślin jest pusta lub pliki nie zostały znalezione w folderze głównym.")
+    st.info("Dodaj bazy danych na GitHubie (`warzywa.py`, `krzewy.py`, `ziola.py`, `kwiaty.py`, `drzewa.py`), aby encyklopedia zaczęła działać.")
 
-st.markdown('</div>', unsafe_allow_html=True)
 
 # ==========================================
-# 6. WYSUWANA SEKCJA: PORADA NA DZIEŃ
+# 6. MIEJSCE NA STOPKĘ AUTORSKĄ I DEDYKACJĘ 
 # ==========================================
-st.markdown('<div class="geo-card">', unsafe_allow_html=True)
-st.markdown("### 📅 Dzisiejsze zalecenia")
+# ========================================================
+# INFORMACJE O PROJEKCIE GRZĄDKOWISKO
+# WYTYCZNE DO APLIKACJI POWSTAWAŁY W LATACH 2023 DO 2026 roku
+# Data zaprojektowania aplikacji: 19-22 maja 2026 roku
+# Status: Wersja PODSTAWOWA UKOŃCZONA 22 MAJA 2026 ROKU
+# ========================================================
 
-with st.expander("💡 Zobacz: Porada na dzień (Kliknij, aby wysunąć)", expanded=False):
+st.sidebar.markdown("<br><br>", unsafe_allow_html=True)
+st.sidebar.markdown("---")
+
+st.sidebar.html("""
+<div style="text-align: center; font-family: Arial, sans-serif; background-color: #1e3d19 !important; padding: 10px 0; width: 100%;">
+    <!-- Dedykacja -->
+    <p style="font-style: italic; color: #d0e1cd; font-size: 0.82rem; line-height: 1.5; margin: 0 0 25px 0;">
+        🌿 „Aplikację dedykuję Mojemu Tacie, babci Helence i przyjaciółce Dorotce, a także tym którzy kochają swoje grządeczki z serdecznością”
+    </p>
     
-    def pobierz_porade_z_zewnatrz():
-        try:
-            url = "https://imgw.pl"
-            r = requests.get(url, timeout=3)
-            if r.status_code == 200 and "<item>" in r.text:
-                tekst = r.text
-                item_start = tekst.find("<item>")
-                start = tekst.find("<title>", item_start) + 7
-                koniec = tekst.find("</title>", start)
-                wynik = tekst[start:koniec]
-                
-                wynik = wynik.replace("<![CDATA[", "").replace("]]>", "")
-                while "<" in wynik and ">" in wynik:
-                    s_idx = wynik.find("<")
-                    e_idx = wynik.find(">") + 1
-                    wynik = wynik.replace(wynik[s_idx:e_idx], "")
-                
-                if len(wynik.strip()) > 5:
-                    return f"📖 <b>Aktualności z bloga IMGW:</b> {wynik.strip()}. Sprawdź prognozy krótkoterminowe przed planowaniem prac."
-        except:
-            pass
-        
-        return "🌞 <b>Bieżące zalecenia:</b> Podlewaj rośliny wyłącznie wczesnym rankiem lub wieczorem, unikając moczenia liści w pełnym słońcu. Regularnie sprawdzaj wilgotność gleby pod osłonami."
-
-    akt_porada = pobierz_porade_z_zewnatrz()
-    
-    st.markdown(f"""
-        <div style="padding: 5px; color: #2D5237; font-size: 1rem; line-height: 1.6;">
-            {akt_porada}
-        </div>
-    """, unsafe_allow_html=True)
-
-st.markdown('</div>', unsafe_allow_html=True)
-
-# ==========================================
-# 7. STOPKA Z TWOJĄ ORYGINALNĄ TREŚCIĄ I DEDYKACJĄ
-# ==========================================
-st.markdown("""
-    <div style="text-align: center; margin-top: 50px; padding: 25px; background-color: #1A3322; border-radius: 14px;">
-        <!-- Dedykacja -->
-        <p style="font-style: italic; color: #d0e1cd; font-size: 0.82rem; line-height: 1.5; margin: 0 0 25px 0;">
-            🌿 „Aplikację dedykuję Mojemu Tacie, babci Helence i przyjaciółce Dorotce, a także tym którzy kochają swoje grządeczki z serdecznością”
-        </p>
-        
-        <!-- Mała, wyśrodkowana nota autorska i prawna -->
-        <p style="margin: 0; font-size: 0.72rem; color: #a3c2a0; letter-spacing: 0.5px;">
-            Projekt i wykonanie: <span style="color: #ffffff; font-weight: bold;">Emilia Olszewska</span>
-        </p>
-        <p style="margin: 4px 0 0 0; font-size: 0.68rem; color: #8cb388;">
-            © 2026 Grządkowisko 🥕🌸🍃🍎<br>
-            Wszelkie prawa zastrzeżone
-        </p>
-    </div>
-""", unsafe_allow_html=True)
+    <!-- Mała, wyśrodkowana nota autorska i prawna -->
+    <p style="margin: 0; font-size: 0.72rem; color: #a3c2a0; letter-spacing: 0.5px;">
+        Projekt i wykonanie: <span style="color: #ffffff; font-weight: bold;">Emilia Olszewska</span>
+    </p>
+    <p style="margin: 4px 0 0 0; font-size: 0.68rem; color: #8cb388;">
+        © 2026 Grządkowisko 🥕🌸🍃🍎
+        Wszelkie prawa zastrzeżone
+    </p>
+</div>
+""")
 
