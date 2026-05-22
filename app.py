@@ -41,7 +41,7 @@ try:
     baza_roslin.update(drzewa_baza)
 except ImportError:
     pass
-
+ 
 # ==========================================
 # 1. KONFIGURACJA STRONY I WIZUALNEGO STYLU
 # ==========================================
@@ -49,13 +49,13 @@ st.set_page_config(page_title="Grządkowisko", page_icon="🌿", layout="centere
 
 st.markdown("""
     <style>
-    /* NOWE TŁO PRAWEJ STRONY: Łagodny, jasny kolor seledynowy */
+    /* Łagodny, jasny seledyn po prawej stronie */
     .stApp {
         background-color: #e2f7df !important;
         background-attachment: fixed;
     }
     
-    /* Białe karty w sekcji głównej (stMain) dla zachowania idealnego kontrastu */
+    /* Białe tło wyłącznie dla kafelków w sekcji głównej */
     section[data-testid="stMain"] div[data-testid="stVerticalBlock"] > div {
         background-color: #ffffff !important;
         padding: 24px;
@@ -64,14 +64,17 @@ st.markdown("""
         border: 1px solid rgba(46, 90, 39, 0.08);
     }
     
-    /* Wyłączenie białego tła dla kontenerów w panelu bocznym (brak ramek w stopce) */
-    section[data-testid="stSidebar"] div {
+    /* OSTATECZNA POPRAWKA: Usunięcie jasnego tła ze wszystkich kontenerów w panelu bocznym */
+    section[data-testid="stSidebar"] div[data-testid="element-container"],
+    section[data-testid="stSidebar"] div[data-testid="stVerticalBlock"] > div {
         background-color: transparent !important;
+        background: transparent !important;
         box-shadow: none !important;
         border: none !important;
+        padding: 0 !important;
     }
     
-    /* Tło dla dymka kalendarza księżycowego w panelu bocznym */
+    /* Przywrócenie tła tylko dla niebieskiego dymka kalendarza księżycowego */
     section[data-testid="stSidebar"] div[data-testid="stNotification"] {
         background-color: rgba(255, 255, 255, 0.1) !important;
     }
@@ -79,17 +82,15 @@ st.markdown("""
     h1 {color: #1e3d19; font-family: 'Arial', sans-serif; font-weight: bold;}
     h3 {color: #2e5a27; font-family: 'Arial', sans-serif;}
     
-    /* Panel boczny: powrót do ciemnej zieleni */
+    /* Panel boczny: ciemnozielony */
     section[data-testid="stSidebar"] {
         background-color: #1e3d19 !important;
     }
     
-    /* Białe napisy w panelu bocznym */
     section[data-testid="stSidebar"] *, section[data-testid="stSidebar"] label, section[data-testid="stSidebar"] p, section[data-testid="stSidebar"] h3 {
         color: #ffffff !important;
     }
     
-    /* Tekst wewnątrz rozwijanych list w panelu bocznym */
     section[data-testid="stSidebar"] div[data-baseweb="select"] * {
         color: #333333 !important;
     }
