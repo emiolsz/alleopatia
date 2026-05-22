@@ -1,4 +1,9 @@
 warzywa_baza = {
+        "Bób": {
+        "typ": "Warzywo", "ph": "6.5 - 7.0", "swiatlo": "Słoneczne", "woda": "Wysokie (zwłaszcza podczas kwitnienia)", "gleba": "Ciężka, żyzna, dobrze zatrzymująca wilgoć",
+        "porada": "Jak wszystkie motylkowe, bób silnie wzbogaca glebę w azot. Aby uchronić go przed czarną mszycą, posadź w rzędach cząber ogrodowy lub nasturcję, a po zawiązaniu strąków usuń czubki wzrostu.",
+        "korzystne": ["Ziemniak", "Kapusta", "Marchew", "Sałata", "Cząber", "Nasturcja"], "niekorzystne": ["Cebula", "Czosnek", "Por", "Pomidor"]
+    },
     "Brokuł": {
         "typ": "Warzywo", "ph": "6.2 - 7.0", "swiatlo": "Pełne słońce", "woda": "Wysokie", "gleba": "Żyzna, próchnicza",
         "porada": "Młode brokuły osłaniaj siatką przed motylami bielinkami.",
