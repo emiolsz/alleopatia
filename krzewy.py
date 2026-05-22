@@ -1,4 +1,4 @@
-baza_krzewow = {
+krzewy_baza = {
     "Aronia": {
         "typ": "Krzew owocowy", "ph": "5.5 - 6.5", "swiatlo": "Słoneczne do półcienia (Wschód/Zachód)", "woda": "Średnie", "gleba": "Przepuszczalna, piaszczysto-gliniasta",
         "porada": "Kierunek: Wschód/Zachód. Bardzo odporna na wiatry i mróz. Doskonale rośnie sadzona w szpalerach obok czarnej porzeczki. Pod koroną warto siać nagietki.",
