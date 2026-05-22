@@ -270,17 +270,24 @@ if baza_roslin:
 else:
     st.info("Dodaj bazy danych na GitHubie (`warzywa.py`, `krzewy.py`, `ziola.py`, `kwiaty.py`, `drzewa.py`), aby encyklopedia zaczęła działać.")
 
-
 # ==========================================
 # 5. MIEJSCE NA STOPKĘ AUTORSKĄ I DEDYKACJĘ
 # ==========================================
 st.sidebar.markdown("<br><br>", unsafe_allow_html=True) # Tworzy duży, naturalny odstęp pionowy od pogody
 st.sidebar.markdown("---")
 
-# Czysty, wyśrodkowany układ bez zbędnych ramek i prostokątów
+#  ramca kolor tła panelu bocznego
 st.sidebar.markdown("""
-    <div style='text-align: center; padding: 0 10px; font-family: sans-serif;'>
-        <!-- Dedykacja na pierwszym miejscu, oddzielona przestrzenią -->
+    <style>
+    section[data-testid="stSidebar"] div[data-testid="stVerticalBlock"] > div:last-child {
+        background-color: #1e3d19 !important; /* Ten sam ciemnozielony kolor panelu bocznego */
+        box-shadow: none !important;           /* Usuwamy cień wokół ramki */
+        border: none !important;               /* Usuwamy ewentualne obwódki */
+    }
+    </style>
+
+    <div style='text-align: center; padding: 0 10px; font-family: sans-serif; background-color: #1e3d19 !important;'>
+        <!-- Dedykacja na pierwszym miejscu -->
         <p style='font-style: italic; color: #d0e1cd; font-size: 0.82rem; line-height: 1.5; margin: 0 0 25px 0;'>
             ❤️ „Mojemu Tacie, babci Helenie i przyjaciółce Dorotce, a także tym którzy kochają swoje grządeczki z serdecznością”
         </p>
@@ -290,8 +297,10 @@ st.sidebar.markdown("""
             Projekt i wykonanie: <span style='color: #ffffff; font-weight: 500;'>Emilia Olszewska</span>
         </p>
         <p style='margin: 4px 0 0 0; font-size: 0.68rem; color: #8cb388;'>
-            © mai 2026 Grządkowisko · Wszelkie prawa zastrzeżone
+            © 22 maja 2026 Grządkowisko · Wszelkie prawa zastrzeżone
         </p>
     </div>
+""", unsafe_allow_html=True)
+
 """, unsafe_allow_html=True)
 
