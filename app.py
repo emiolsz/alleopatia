@@ -1,8 +1,47 @@
 import streamlit as st
 import requests
 from datetime import datetime
-# Importujemy bazę roślin z naszego nowego pliku baza.py
-from baza import baza_roslin
+
+# ========================================================
+# AUTOMATYCZNE ŁĄCZENIE BAZ DANYCH Z 5 OSOBNYCH PLIKÓW
+# ========================================================
+baza_roslin = {}
+
+# 1. Import z warzywa.py
+try:
+    from warzywa import warzywa_baza
+    baza_roslin.update(warzywa_baza)
+except ImportError:
+    pass
+
+# 2. Import z krzewy.py
+try:
+    from krzewy import krzewy_baza
+    baza_roslin.update(krzewy_baza)
+except ImportError:
+    pass
+
+# 3. Import z ziola.py
+try:
+    from ziola import ziola_baza
+    baza_roslin.update(ziola_baza)
+except ImportError:
+    pass
+
+# 4. Import z kwiaty.py
+try:
+    from kwiaty import kwiaty_baza
+    baza_roslin.update(kwiaty_baza)
+except ImportError:
+    pass
+
+# 5. Import z drzewa.py
+try:
+    from drzewa import drzewa_baza
+    baza_roslin.update(drzewa_baza)
+except ImportError:
+    pass
+
 
 # ==========================================
 # 1. KONFIGURACJA STRONY I WIZUALNEGO STYLU
@@ -22,6 +61,7 @@ st.markdown("""
 
 st.title("🌿 Grządkowisko")
 st.subheader("Twój inteligentny asystent ogrodowy")
+
 
 # ==========================================
 # 2. LOGIKA: KALENDARZ (DATA, DZIEŃ, IMIENINY) i KSIĘŻYC
@@ -48,13 +88,12 @@ def pobierz_faze_ksiezyca():
     else:
         return "🌗 Ostatnia kwadra", "Dni Korzenia. Soki schodzą w dół. Najlepszy czas na siew marchewki, pietruszki, rzodkiewki."
 
-# Rozbudowana baza imienin na cały rok (przykładowe popularne dni ogrodnicze)
 baza_imienin = {
     1: {1: "Mieszka, Mieczysława", 2: "Makarego, Bazylego", 22: "Wincentego, Anastazego"},
     2: {2: "Marii, Mirosława", 14: "Walentego, Cyryla"},
     3: {4: "Kazimierza, Łucji", 19: "Józefa, Bogdana"},
     4: {23: "Wojciecha, Jerzego", 30: "Mariana, Katarzyny"},
-    5: {1: "Józefa, Jerzego", 8: "Stanisława, Lizy", 12: "Pankracego (Ogrodnika)", 13: "Serwacego (Ogrodnika)", 14: "Bonifacego (Ogrodnika)", 15: "Zofii (Zimnej Zośki), Izydora", 22: "Heleny, Julii", 23: "Emilii, Iwony"},
+    5: {1: "Józefa, Filipa", 8: "Stanisława, Lizy", 12: "Pankracego (Ogrodnika)", 13: "Serwacego (Ogrodnika)", 14: "Bonifacego (Ogrodnika)", 15: "Zofii (Zimnej Zośki), Izydora", 22: "Heleny, Julii", 23: "Emilii, Iwony"},
     6: {1: "Jakuba, Konrada", 24: "Jana, Danuty", 29: "Piotra, Pawła"},
     7: {22: "Magdaleny, Bolesława", 26: "Anny, Mirosławy"},
     8: {15: "Marii, Napoleona", 26: "Marii, Częstochowskiej"},
@@ -78,15 +117,14 @@ def pobierz_dane_kalendarza():
     imieniny = baza_imienin.get(dzis.month, {}).get(dzis.day, "Brak popularnych imienin w bazie")
     return pelna_data, dzien_roku, imieniny
 
-# Wyświetlanie sekcji kalendarza w panelu bocznym
 pelna_data, dzien_roku, imieniny = pobierz_dane_kalendarza()
 st.sidebar.markdown("### 📅 Kalendarz")
 st.sidebar.markdown(f"**Data:** {pelna_data}\n\n**Dzień roku:** {dzien_roku}/365\n\n**Imieniny:** {imieniny}")
 
-# Sekcja księżycowa poniżej daty
 faza_nazwa, faza_porada = pobierz_faze_ksiezyca()
 st.sidebar.markdown(f"### 🌙 Kalendarz Księżycowy")
 st.sidebar.info(f"**Dzisiejsza faza:** {faza_nazwa}\n\n*Wytyczne:* {faza_porada}")
+
 
 # ==========================================
 # 3. LOGIKA: DANE METEOROLOGICZNE IMGW API
@@ -114,13 +152,11 @@ if dane_pogodowe:
     opad = float(dane_stacji['suma_opadu'])
     wilgotnosc = float(dane_stacji.get('wilgotnosc_wzgledna', 0))
     
-    # Wyświetlanie trzech metryk obok siebie
     col_temp, col_opad, col_wilg = st.sidebar.columns(3)
     col_temp.metric(label="Temp.", value=f"{temp} °C")
     col_opad.metric(label="Opad", value=f"{opad} mm")
     col_wilg.metric(label="Wilg.", value=f"{wilgotnosc} %")
     
-    # Wykrywanie zjawisk
     zjawiska = []
     if temp < 2.0:
         zjawiska.append("❄️ Przymrozek")
@@ -145,30 +181,48 @@ if dane_pogodowe:
 else:
     st.sidebar.warning("Nie udało się załadować danych meteo.")
 
-# ==========================================
-# 4. INTERFEJS UŻYTKOWNIKA (WYSZUKIWARKA)
-# ==========================================
-wybrana_roslina = st.selectbox("🔍 Wybierz roślinę, kwiat, zioło lub krzew/drzewo owocowe:", list(baza_roslin.keys()))
 
-if wybrana_roslina:
-    dane = baza_roslin[wybrana_roslina]
+# ==========================================
+# 4. INTERFEJS UŻYTKOWNIKA (WYSZUKIWARKA ENCYKLOPEDII)
+# ==========================================
+if baza_roslin:
+    wybrana_roslina = st.selectbox("🔍 Wybierz obiekt z encyklopedii:", list(baza_roslin.keys()))
     
-    st.markdown(f"### 📖 Karta obiektu: {wybrana_roslina} ({dane.get('typ', 'Roślina')})")
-    
-    with st.container():
-        col1, col2 = st.columns(2)
-        with col1:
-            st.write(f"**🧪 Wymagane pH gleby:** {dane['ph']}")
-            st.write(f"**☀️ Stanowisko / Światło:** {dane['swiatlo']}")
-        with col2:
-            st.write(f"**💧 Zapotrzebowanie na wodę:** {dane['woda']}")
-            st.write(f"**🌱 Preferowany rodzaj gleby:** {dane['gleba']}")
-            
-    st.info(f"💡 **Porada eksperta i uprawa:** {dane['porada']}")
-    
-    # Sąsiedztwo i partnerstwo roślin
-    col_k, col_nk = st.columns(2)
-    with col_k:
-        st.success("👍 **Dobre sąsiedztwo / Dobre pary:**\n\n" + ", ".join(dane["korzystne"]) if dane["korzystne"] else "Brak szczególnych partnerów")
-    with col_nk:
-        st.error("👎 **Złe sąsiedztwo (Unikać):**\n\n" + ", ".join(dane["niekorzystne"]) if dane["niekorzystne"] else "Brak wyraźnych wrogów")
+    if wybrana_roslina:
+        dane = baza_roslin[wybrana_roslina]
+        
+        st.markdown(f"### 📖 Karta obiektu: {wybrana_roslina} ({dane.get('typ', 'Roślina')})")
+        
+        with st.container():
+            col1, col2 = st.columns(2)
+            with col1:
+                st.write(f"**🧪 Wymagane pH gleby:** {dane['ph']}")
+                st.write(f"**☀️ Stanowisko / Światło:** {dane['swiatlo']}")
+            with col2:
+                st.write(f"**💧 Zapotrzebowanie na wodę:** {dane['woda']}")
+                st.write(f"**🌱 Preferowany rodzaj gleby:** {dane['gleba']}")
+                
+        st.info(f"💡 **Porada eksperta i uprawa:** {dane['porada']}")
+        
+        col_k, col_nk = st.columns(2)
+        with col_k:
+            st.success("👍 **Dobre sąsiedztwo / Dobre pary:**\n\n" + ", ".join(dane["korzystne"]) if dane["korzystne"] else "Brak szczególnych partnerów")
+        with col_nk:
+            st.error("👎 **Złe sąsiedztwo (Unikać):**\n\n" + ", ".join(dane["niekorzystne"]) if dane["niekorzystne"] else "Brak wyraźnych wrogów")
+else:
+    st.info("Dodaj bazy danych na GitHubie (`warzywa.py`, `krzewy.py`, `ziola.py`, `kwiaty.py`, `drzewa.py`), aby encyklopedia zaczęła działać.")
+
+
+# ==========================================
+# 5. MIEJSCE NA STOPKĘ AUTORSKĄ I DEDYKACJĘ
+# ==========================================
+st.sidebar.markdown("---")
+st.sidebar.caption("✍️ Projekt i wykonanie:")
+st.sidebar.markdown("Emilia Olszewska maj 2026")
+
+# TUTAJ DODAJEMY ZASTRZEŻENIE O PRAWACH AUTORSKICH
+st.sidebar.markdown("<p style='font-size: 0.75rem; color: #888; margin-bottom: 0px;'>© 2026 Grządkowisko. Wszelkie prawa zastrzeżone.</p>", unsafe_allow_html=True)
+
+# Dedykacja z ładną, pochyloną czcionką
+st.sidebar.markdown("<p style='font-style: italic; color: #666; font-size: 0.85rem; margin-top: 10px;'>❤️ „Mojemu Tacie, babci Helenie i przyjaciółce Dorotce, a takze tym którzy kochają swoje grządeczki”</p>", unsafe_allow_html=True)
+
