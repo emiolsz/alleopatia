@@ -170,17 +170,16 @@ st.sidebar.html(f"""
 st.sidebar.html("""<h3 style="color: #ffffff !important; margin-top: 15px; margin-bottom: 5px; font-size: 1.2rem; font-family: Arial, sans-serif;">🌤️ Pogoda w Twoim ogrodzie</h3>""")
 
 # Całkowicie natywne i bezpieczne pole tekstowe Streamlit
-miasto = st.sidebar.text_input("Wpisz swoją miejscowość / miasto:", value="Warszawa")
-
+miasto = st.sidebar.text_input("Wpisz swoją miejscowość / miasto:", value="Warszawa")    
 @st.cache_data(ttl=3600)
 def pobierz_wspolrzedne_miasta(nazwa_miasta):
     try:
-        # Prawidłowy link do wyszukiwarki miast Open-Meteo
         url_geo = f"https://open-meteo.com{nazwa_miasta}&count=1&language=pl&format=json"
         odpowiedz = requests.get(url_geo, timeout=5)
         if odpowiedz.status_code == 200:
             dane = odpowiedz.json()
             if "results" in dane and len(dane["results"]) > 0:
+                # TUTAJ DODAŁEM [0] - pobieramy pierwszy obiekt z listy miast
                 wynik = dane["results"][0]
                 return wynik.get("latitude"), wynik.get("longitude"), wynik.get("name", nazwa_miasta)
     except:
