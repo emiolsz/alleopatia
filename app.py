@@ -147,69 +147,47 @@ st.sidebar.html(f"""
         </div>
     </div>
 """)
-
+ 
 # ==========================================
-# 3. LOGIKA: POGODA DLA TWOJEJ MIEJSCOWOŚCI
+# 3. LOGIKA: DANE METEOROLOGICZNE IMGW API (CAŁA POLSKA)
 # ==========================================
-import urllib.parse
-
-st.sidebar.html("""<h3 style="color: #ffffff !important; margin-top: 15px; margin-bottom: 5px; font-size: 1.3rem; font-family: Arial, sans-serif;">🌤️ Pogoda Lokalna</h3>""")
-
-# Okienko tekstowe do wpisania dowolnej lokalizacji przez działkowicza
-lokalizacja = st.sidebar.text_input("📍 Wpisz swoją miejscowość / wieś:", value="Warszawa")
+st.sidebar.html("""<h3 style="color: #ffffff !important; margin-top: 15px; margin-bottom: 5px; font-size: 1.3rem; font-family: Arial, sans-serif;">🌤️ Pogoda dla Polski (IMGW)</h3>""")
 
 @st.cache_data(ttl=1800)
-def pobierz_pogode_lokalna(miasto):
+def pobierz_pogode_imgw():
     try:
-        # Bezpieczne kodowanie polskich znaków (np. Kraków -> Krak%C3%B3w)
-        miasto_kodowane = urllib.parse.quote(miasto.strip())
-        
-        # 1. Geokodowanie - szukanie współrzędnych miejscowości
-        geo_url = f"https://open-meteo.com{miasto_kodowane}&count=1&language=pl&format=json"
-        geo_res = requests.get(geo_url, timeout=5).json()
-        
-        if not geo_res.get("results"):
-            return None
-            
-        lat = geo_res["results"][0]["latitude"]
-        lon = geo_res["results"][0]["longitude"]
-        nazwa_pelna = geo_res["results"][0]["name"]
-        kraj = geo_res["results"][0].get("country", "")
-        
-        # Filtrujemy wyniki, aby upewnić się, że szukamy w Polsce (jeśli wpisano polską wieś)
-        if len(geo_res["results"]) > 1:
-            for res in geo_res["results"]:
-                if res.get("country") == "Polska":
-                    lat = res["latitude"]
-                    lon = res["longitude"]
-                    nazwa_pelna = res["name"]
-                    kraj = "Polska"
-                    break
-        
-        # 2. Pobieranie dokładnych parametrów meteo dla współrzędnych z satelity
-        weather_url = f"https://open-meteo.com{lat}&longitude={lon}&current=temperature_2m,relative_humidity_2m,precipitation&timezone=auto"
-        w_res = requests.get(weather_url, timeout=5).json()
-        
-        current = w_res["current"]
-        return {
-            "miasto": f"{nazwa_pelna} ({kraj})" if kraj else nazwa_pelna,
-            "temp": float(current["temperature_2m"]),
-            "wilgotnosc": float(current["relative_humidity_2m"]),
-            "opad": float(current["precipitation"])
-        }
+        url = "https://imgw.pl"
+        odpowiedz = requests.get(url, timeout=5)
+        if odpowiedz.status_code == 200:
+            return odpowiedz.json()
     except:
         return None
 
-dane_pogodowe = pobierz_pogode_lokalna(lokalizacja)
+dane_pogodowe = pobierz_pogode_imgw()
 
 if dane_pogodowe:
-    temp = dane_pogodowe["temp"]
-    opad = dane_pogodowe["opad"]
-    wilgotnosc = dane_pogodowe["wilgotnosc"]
+    # Pobieramy alfabetyczną listę wszystkich stacji w Polsce
+    stacje = sorted([stacja['stacja'] for stacja in dane_pogodowe])
     
-    # Wyświetlanie metryk w czystym HTML
+    # Ustawiamy Legionowo jako domyślny start, jeśli jest dostępne w bazie
+    domyslny_indeks = 0
+    for i, s in enumerate(stacje):
+        if "legionowo" in s.lower():
+            domyslny_indeks = i
+            break
+            
+    # Rozwijana lista z wyszukiwarką dla całej Polski
+    wybrane_miasto = st.sidebar.selectbox("Wybierz stację pomiarową:", stacje, index=domyslny_indeks)
+    
+    dane_stacji = next(item for item in dane_pogodowe if item["stacja"] == wybrane_miasto)
+    
+    temp = float(dane_stacji['temperatura'])
+    opad = float(dane_stacji['suma_opadu'])
+    wilgotnosc = float(dane_stacji.get('wilgotnosc_wzgledna', 0))
+    
+    # Renderowanie metryk w czystym układzie HTML
     st.sidebar.html(f"""
-        <p style="color: #d0e1cd !important; font-size: 0.85rem; margin: 0 0 10px 0; font-family: Arial, sans-serif;">Wyniki dla: <b>{dane_pogodowe['miasto']}</b></p>
+        <p style="color: #d0e1cd !important; font-size: 0.85rem; margin: 5px 0 10px 0; font-family: Arial, sans-serif;">Odczyt ze stacji: <b>{wybrane_miasto}</b></p>
         <div style="display: flex; justify-content: space-between; font-family: Arial, sans-serif; text-align: center; margin-bottom: 15px;">
             <div style="background: rgba(255,255,255,0.08); padding: 8px; border-radius: 6px; width: 30%;">
                 <span style="font-size: 0.75rem; color: #ccc; display: block;">Temp.</span>
@@ -226,7 +204,7 @@ if dane_pogodowe:
         </div>
     """)
     
-    # Wykrywanie zjawisk niebezpiecznych
+    # Wykrywanie zjawisk z oficjalnych czujników synoptycznych
     zjawiska = []
     if temp < 2.0: zjawiska.append("❄️ Przymrozek")
     if wilgotnosc > 95.0 and temp > 0: zjawiska.append("🌫️ Mgła")
@@ -245,7 +223,7 @@ if dane_pogodowe:
     else:
         st.sidebar.success("🌱 Warunki stabilne dla wzrostu.")
 else:
-    st.sidebar.html("<p style='color:#ffaa00; font-size:0.85rem; margin-top:10px; font-family:Arial,sans-serif;'>⚠️ Nie znaleziono miejscowości. Sprawdź pisownię.</p>")
+    st.sidebar.html("<p style='color:#ffaa00; font-size:0.85rem; margin-top:10px; font-family:Arial,sans-serif;'>⚠️ Serwer IMGW chwilowo przeciążony. Dane odświeżą się automatycznie.</p>")
 
 # ==========================================
 # 4. INTERFEJS UŻYTKOWNIKA (WYSZUKIWARKA ENCYKLOPEDII)
