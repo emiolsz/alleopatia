@@ -138,60 +138,6 @@ st.sidebar.html(f"""
 """)
 
 # ==========================================
-# 4. LOGIKA POGODY IMGW (Z ZABEZPIECZENIEM SIECIOWYM)
-# ==========================================
-st.sidebar.html('<h3 style="color: #ffffff !important; margin-top: 25px; margin-bottom: 10px; font-size: 1.25rem; font-weight:600;">🌤️ Pogoda IMGW</h3>')
-
-@st.cache_data(ttl=600)
-def pobierz_pogode_bezpiecznie():
-    try:
-        # Odpytanie oficjalnego API IMGW
-        url = "https://imgw.pl"
-        r = requests.get(url, timeout=3)
-        if r.status_code == 200:
-            return r.json(), "live"
-    except Exception:
-        pass
-    
-    # PEŁNY FALLBACK POGODOWY: Jeśli Twoja sieć lub serwer IMGW leży, ładujemy lokalne stabilne dane pomiarowe
-    dane_sztywne = [{
-        "stacja": "Warszawa (Stacja Awaryjna)", "temperatura": "17.4", 
-        "suma_opadu": "0.0", "wilgotnosc_wzgledna": "58", "cisnienie": "1016"
-    }, {
-        "stacja": "Legionowo (Stacja Awaryjna)", "temperatura": "16.9", 
-        "suma_opadu": "0.0", "wilgotnosc_wzgledna": "60", "cisnienie": "1016"
-    }]
-    return dane_sztywne, "cached"
-
-dane_pogodowe, status_api = pobierz_pogode_bezpiecznie()
-stacje = sorted([stacja['stacja'] for stacja in dane_pogodowe])
-
-domyslny_idx = 0
-for idx, s in enumerate(stacje):
-    if "legionowo" in s.lower() or "warszawa" in s.lower():
-        domyslny_idx = idx
-        break
-
-wybrane_miasto = st.sidebar.selectbox("Wybierz stację:", stacje, index=domyslny_idx, label_visibility="collapsed")
-
-dane_stacji = next(item for item in dane_pogodowe if item["stacja"] == wybrane_miasto)
-temp, opad, wilg, cisn = dane_stacji['temperatura'], dane_stacji['suma_opadu'], dane_stacji['wilgotnosc_wzgledna'], dane_stacji.get('cisnienie', '1014')
-
-status_txt = "⚠️ Serwer IMGW offline - Tryb awaryjny" if status_api == "cached" else "🟢 Dane pobrane pomyślnie"
-
-st.sidebar.html(f"""
-    <div class="sidebar-card" style="background: rgba(0,0,0,0.15); margin-bottom: 5px;">
-        <div style="font-size: 1.6rem; font-weight: bold; color: #ffffff;">{temp}°C</div>
-        <div style="font-size: 0.85rem; opacity: 0.8; line-height: 1.5; margin-top: 5px;">
-            💧 <b>Wilgotność:</b> {wilg}%<br>
-            🌧️ <b>Opad:</b> {opad} mm<br>
-            📉 <b>Ciśnienie:</b> {cisn} hPa
-        </div>
-        <div style="font-size: 0.7rem; color: #A9DFBF; margin-top: 8px; font-style: italic;">{status_txt}</div>
-    </div>
-""")
-
-# ==========================================
 # 4. PANEL BOCZNY: LEGENDA SYMBOLI
 # ==========================================
 st.sidebar.html("""
@@ -207,89 +153,105 @@ st.sidebar.html("""
 """)
 
 # ==========================================
-# 5. PANEL GŁÓWNY: INTERFEJS WYSZUKIWANIA
+# 5. PANEL GŁÓWNY: INTERFEJS WYSZUKIWANIA ROŚLIN
 # ==========================================
 st.markdown('<div class="geo-card">', unsafe_allow_html=True)
 st.markdown("### 🔍 Znajdź roślinę w swojej bazie")
 
-lista_roslin = sorted(list(baza_roslin.keys()))
-wybrana_roslina = st.selectbox("Wyszukaj:", lista_roslin, label_visibility="collapsed")
+# Tworzenie listy rozwijanej na podstawie załadowanych słowników
+lista_roslin = sorted(list(baza_roslin.keys())) if baza_roslin else []
 
-if wybrana_roslina:
-    dane = baza_roslin[wybrana_roslina]
+if lista_roslin:
+    wybrana_roslina = st.selectbox("Wyszukaj:", lista_roslin, label_visibility="collapsed")
     
-    st.markdown(f"<h2 style='color: #1A3322; margin-top: 15px;'>🌿 {wybrana_roslina.capitalize()}</h2>", unsafe_allow_html=True)
-    
-    col1, col2, col3 = st.columns(3)
-    with col1: st.metric(label="☀️ Stanowisko", value=dane['stanowisko'])
-    with col2: st.metric(label="💧 Podlewanie", value=dane['podlewanie'])
-    with col3: st.metric(label="🌱 Rozstawa", value=dane['rozstawa'])
+    if wybrana_roslina:
+        dane = baza_roslin[wybrana_roslina]
         
-    st.markdown(f"""
-        <div style="background-color: #F9FBF9; padding: 15px; border-radius: 10px; border-left: 4px solid #2D5237; margin-top: 25px;">
-            <h4 style="margin: 0 0 8px 0; color: #2D5237; font-weight: 600;">💡 Wskazówki i porady uprawowe:</h4>
-            <p style="margin: 0; color: #4A5D4E; font-size: 0.95rem; line-height: 1.5;">{dane['notatki']}</p>
-        </div>
-    """, unsafe_allow_html=True)
+        st.markdown(f"<h2 style='color: #1A3322; margin-top: 15px;'>🌿 {str(wybrana_roslina).capitalize()}</h2>", unsafe_allow_html=True)
+        
+        col1, col2, col3 = st.columns(3)
+        with col1: st.metric(label="☀️ Stanowisko", value=dane.get('stanowisko', 'Brak danych'))
+        with col2: st.metric(label="💧 Podlewanie", value=dane.get('podlewanie', 'Brak danych'))
+        with col3: st.metric(label="🌱 Rozstawa", value=dane.get('rozstawa', 'Brak danych'))
+            
+        st.markdown(f"""
+            <div style="background-color: #F9FBF9; padding: 15px; border-radius: 10px; border-left: 4px solid #2D5237; margin-top: 25px;">
+                <h4 style="margin: 0 0 8px 0; color: #2D5237; font-weight: 600;">💡 Wskazówki i porady uprawowe:</h4>
+                <p style="margin: 0; color: #4A5D4E; font-size: 0.95rem; line-height: 1.5;">{dane.get('notatki', 'Brak dodatkowych uwag w bazie danych.')}</p>
+            </div>
+        """, unsafe_allow_html=True)
+else:
+    st.warning("Nie znaleziono żadnych roślin. Upewnij się, że Twoje pliki (np. warzywa.py, ziola.py) znajdują się w tym samym folderze.")
 
 st.markdown('</div>', unsafe_allow_html=True)
 
 # ==========================================
-# 6. NOWOŚĆ: WYSUWANA "PORADA NA DZIEŃ" (ZASYSANIE Z BLOGA IMGW ORAZ BACKUP)
+# 6. WYSUWANA "PORADA NA DZIEŃ" 
 # ==========================================
 st.markdown('<div class="geo-card">', unsafe_allow_html=True)
 st.markdown("### 📅 Dzisiejsze zalecenia")
 
-# Wykorzystujemy nowoczesny, natywny komponent wysuwanego menu Streamlit (st.expander)
 with st.expander("💡 Zobacz: Porada na dzień (Kliknij, aby wysunąć)", expanded=False):
     
-    # Funkcja próbująca pobrać najnowsze wpisy ekologiczno-pogodowe z zewnętrznego źródła (RSS IMGW)
     def pobierz_porade_z_zewnatrz():
         try:
-            # Pobieramy publiczny kanał informacyjny o pogodzie i klimacie w Polsce
             url = "https://imgw.pl"
             r = requests.get(url, timeout=3)
-            if r.status_code == 200 and "item" in r.text:
-                # Proste wycięcie tytułu najnowszego artykułu jako motywu przewodniego dnia
+            if r.status_code == 200 and "<item>" in r.text:
                 tekst = r.text
-                start = tekst.find("<title>") + 7
+                item_start = tekst.find("<item>")
+                start = tekst.find("<title>", item_start) + 7
                 koniec = tekst.find("</title>", start)
-                start_drugi = tekst.find("<title>", koniec) + 7
-                koniec_drugi = tekst.find("</title>", start_drugi)
-                wynik = tekst[start_drugi:koniec_drugi].replace("<![CDATA[", "").replace("]]>", "")
-                return f"📖 <b>Aktualny temat dnia z IMGW:</b> {wynik}. Dostosuj prace ogrodowe pod nadchodzące zmiany frontów atmosferycznych."
+                wynik = tekst[start:koniec]
+                
+                wynik = wynik.replace("<![CDATA[", "").replace("]]>", "")
+                while "<" in wynik and ">" in wynik:
+                    s_idx = wynik.find("<")
+                    e_idx = wynik.find(">") + 1
+                    wynik = wynik.replace(wynik[s_idx:e_idx], "")
+                
+                if len(wynik.strip()) > 5:
+                    return f"📖 <b>Aktualności z bloga IMGW:</b> {wynik.strip()}. Sprawdź prognozy przed planowaniem prac."
         except Exception:
             pass
         
-        # SYSTEM ZAPASOWY: Dopasowanie stabilnej porady bezpośrednio do kalendarza i dnia roku
+        # SYSTEM ZAPASOWY
         dzis = datetime.now()
         if dzis.month in [5, 6, 7, 8]:
-            return "🌞 <b>Letnia rutyna:</b> Podlewaj grządki wyłącznie wczesnym rankiem lub wieczorem. Unikaj zraszania liści w pełnym słońcu, aby zapobiec poparzeniom roślin."
+            return "🌞 <b>Letnia rutyna:</b> Podlewaj grządki wyłącznie wczesnym rankiem lub wieczorem. Unikaj zraszania liści w pełnym słońcu, aby zapobiec poparzeniom."
         elif dzis.month in [9, 10, 11]:
-            return "🍁 <b>Jesienne porządki:</b> Czas na ściółkowanie gleby kompostem lub suchymi liśćmi, aby zabezpieczyć systemy korzeniowe przed pierwszymi przymrozkami."
+            return "🍁 <b>Jesienne porządki:</b> Czas na ściółkowanie gleby kompostem, aby zabezpieczyć korzenie przed przymrozkami."
         else:
-            return "❄️ <b>Zimowy odpoczynek:</b> Kontroluj stan przechowywanych bulw i nasion. Zaplanuj rozkład grządek i płodozmian na nadchodzący nowy sezon."
+            return "❄️ <b>Zimowy odpoczynek:</b> Kontroluj stan przechowywanych nasion. Zaplanuj płodozmian na nowy sezon."
 
     akt_porada = pobierz_porade_z_zewnatrz()
     
-    # Renderowanie tekstu porady w nowoczesnej ramce
     st.markdown(f"""
-        <div style="padding: 10px 5px; color: #2D5237; font-size: 1rem; line-height: 1.6;">
+        <div style="padding: 5px; color: #2D5237; font-size: 1rem; line-height: 1.6;">
             {akt_porada}
-            <br><br>
-            <span style="font-size: 0.85rem; color: #8CA392; font-style: italic;">
-                *Porada synchronizuje się automatycznie na podstawie aktualnej daty oraz zewnętrznych biuletynów agro-klimatycznych.
-            </span>
         </div>
     """, unsafe_allow_html=True)
 
 st.markdown('</div>', unsafe_allow_html=True)
 
 # ==========================================
-# 7. STOPKA (FOOTER) APLIKACJI
+# 7. STOPKA Z TWOJĄ ORYGINALNĄ TREŚCIĄ I STYLIZACJĄ
 # ==========================================
 st.markdown("""
-    <div style="text-align: center; margin-top: 40px; padding: 15px 0; border-top: 1px solid #E2EFE5;">
-        <p style="color: #8CA392; font-size: 0.85rem; margin: 0;"><b>Grządkowisko App</b> • Stabilny silnik v2.1 🌿</p>
+    <div style="text-align: center; margin-top: 50px; padding: 25px; background-color: #1A3322; border-radius: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.02);">
+        <!-- Dedykacja -->
+        <p style="font-style: italic; color: #d0e1cd; font-size: 0.82rem; line-height: 1.5; margin: 0 0 25px 0;">
+            🌿 „Aplikację dedykuję Mojemu Tacie, babci Helence i przyjaciółce Dorotce, a także tym którzy kochają swoje grządeczki z serdecznością”
+        </p>
+        
+        <!-- Mała, wyśrodkowana nota autorska i prawna -->
+        <p style="margin: 0; font-size: 0.72rem; color: #a3c2a0; letter-spacing: 0.5px;">
+            Projekt i wykonanie: <span style="color: #ffffff; font-weight: bold;">Emilia Olszewska</span>
+        </p>
+        <p style="margin: 4px 0 0 0; font-size: 0.68rem; color: #8cb388;">
+            © 2026 Grządkowisko 🥕🌸🍃🍎<br>
+            Wszelkie prawa zastrzeżone
+        </p>
     </div>
 """, unsafe_allow_html=True)
+
