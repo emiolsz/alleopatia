@@ -265,8 +265,14 @@ else:
 
 # ==========================================
 # 5. MIEJSCE NA STOPKĘ AUTORSKĄ I DEDYKACJĘ 
-aplikację zaprojektowano 20-22 maja 2026
 # ==========================================
+# ========================================================
+# INFORMACJE O PROJEKCIE GRZĄDKOWISKO
+# WYTYCZNE DO APLIKACJI POWSTAWAŁY W LATACH 2023 DO 2026 roku
+# Data zaprojektowania aplikacji: 19-22 maja 2026 roku
+# Status: Wersja PODSTAWOWA UKOŃCZONA 22 MAJA 2026 ROKU
+# ========================================================
+
 st.sidebar.markdown("<br><br>", unsafe_allow_html=True)
 st.sidebar.markdown("---")
 st.sidebar.html("""
