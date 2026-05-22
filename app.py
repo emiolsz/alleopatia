@@ -163,56 +163,64 @@ st.sidebar.html(f"""
         </div>
     </div>
 """)
-
 # ==========================================
-# 3. LOGIKA: DANE METEOROLOGICZNE IMGW API
+# 3. LOGIKA: DANE METEOROLOGICZNE IMGW API (POPRAWIONE)
 # ==========================================
-st.sidebar.html("""<h3 style="color: #ffffff !important; margin-top: 15px; margin-bottom: 5px; font-size: 1.2rem; font-family: Arial, sans-serif;">🌤️ Pogoda IMGW</h3>""")
+st.sidebar.html("""h3 style="color: #ffffff !important; margin-top: 15px; margin-bottom: 5px; font-size: 1.2rem; font-family: Arial, sans-serif;">🌤️ Pogoda IMGW</h3>""")
 
 @st.cache_data(ttl=600)
 def pobierz_pogode_imgw():
     try:
+        # Oficjalne i publiczne API IMGW z danymi synoptycznymi
         url = "https://imgw.pl"
-        odpowiedz = requests.get(url, timeout=3)
+        odpowiedz = requests.get(url, timeout=5)
         if odpowiedz.status_code == 200:
             return odpowiedz.json()
-    except:
+    except Exception as e:
         return None
+    return None
 
 dane_pogodowe = pobierz_pogode_imgw()
 
 if dane_pogodowe:
+    # Pobieramy nazwy stacji i sortujemy je alfabetycznie
     stacje = sorted([stacja['stacja'] for stacja in dane_pogodowe])
     
+    # Ustawianie domyślnego miasta (np. Warszawa)
     domyslny_indeks = 0
     for i, s in enumerate(stacje):
-        if "legionowo" in s.lower() or "warszawa" in s.lower():
+        if "warszawa" in s.lower():
             domyslny_indeks = i
             break
             
     wybrane_miasto = st.sidebar.selectbox("Wybierz stację:", stacje, index=domyslny_indeks, label_visibility="collapsed")
     
+    # Wyciąganie danych dla wybranego miasta
     dane_stacji = next(item for item in dane_pogodowe if item["stacja"] == wybrane_miasto)
     
+    # API IMGW zwraca wartości jako stringi lub None, warto zabezpieczyć wyświetlanie
     temp = dane_stacji.get('temperatura', '0')
     opad = dane_stacji.get('suma_opadu', '0')
     wilgotnosc = dane_stacji.get('wilgotnosc_wzgledna', '0')
     cisnienie = dane_stacji.get('cisnienie', 'Brak danych')
+    if cisnienie is None:
+        cisnienie = "Brak danych"
     
     st.sidebar.html(f"""
-        <div class="sidebar-card" style="background: rgba(0, 0, 0, 0.15);">
+        <div class="sidebar-card" style="background: rgba(0, 0, 0, 0.15); padding: 14px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.1); margin-bottom: 15px;">
             <div style="font-size: 1.5rem; font-weight: bold; color: #ffffff; margin-bottom: 5px;">{temp}°C</div>
-            <p style="margin: 3px 0; font-size: 0.88rem;">💧 <b>Wilgotność:</b> {wilgotnosc}%</p>
-            <p style="margin: 3px 0; font-size: 0.88rem;">🌧️ <b>Suma opadu:</b> {opad} mm</p>
-            <p style="margin: 3px 0; font-size: 0.88rem;">📉 <b>Ciśnienie:</b> {cisnienie} hPa</p>
+            <p style="margin: 3px 0; font-size: 0.88rem; color: #E2EFE5;">💧 <b>Wilgotność:</b> {wilgotnosc}%</p>
+            <p style="margin: 3px 0; font-size: 0.88rem; color: #E2EFE5;">🌧️ <b>Suma opadu:</b> {opad} mm</p>
+            <p style="margin: 3px 0; font-size: 0.88rem; color: #E2EFE5;">📉 <b>Ciśnienie:</b> {cisnienie} hPa</p>
         </div>
     """)
 else:
     st.sidebar.html("""
-        <div class="sidebar-card" style="background: rgba(255, 0, 0, 0.05); border-left: 3px solid #ff4b4b;">
-            <p style="margin: 0; font-size: 0.85rem; color: #ff8888;">⚠️ Serwer IMGW zajęty. Odśwież stronę.</p>
+        <div class="sidebar-card" style="background: rgba(255, 0, 0, 0.1); border-left: 3px solid #ff4b4b; padding: 14px; border-radius: 10px; margin-bottom: 15px;">
+            <p style="margin: 0; font-size: 0.88rem; color: #ff8f8f;">⚠️ Nie udało się pobrać aktualnych danych pogodowych IMGW.</p>
         </div>
     """)
+
 # ==========================================
 # 4. PANEL BOCZNY: LEGENDA SYMBOLI
 # ==========================================
