@@ -162,8 +162,8 @@ st.sidebar.html(f"""
             <p style="margin: 0; font-size: 0.88rem; line-height: 1.4; color: #ffffff;"><b>Wytyczne:</b> {faza_porada}</p>
         </div>
     </div>
-""")    
-
+""")          
+  
 # ==========================================
 # 3. LOGIKA: DANE METEOROLOGICZNE - AUTOMATYCZNA LOKALIZACJA (OPEN-METEO)
 # ==========================================
@@ -175,12 +175,14 @@ miasto = st.sidebar.text_input("Wpisz swoją miejscowość / miasto:", value="Wa
 @st.cache_data(ttl=3600)
 def pobierz_wspolrzedne_miasta(nazwa_miasta):
     try:
-        # Darmowe i szybkie API geokodowania Open-Meteo (zamienia tekst na współrzędne)
+        # Prawidłowy link do wyszukiwarki miast Open-Meteo
         url_geo = f"https://open-meteo.com{nazwa_miasta}&count=1&language=pl&format=json"
         odpowiedz = requests.get(url_geo, timeout=5)
-        if odpowiedz.status_code == 200 and "results" in odpowiedz.json():
-            wynik = odpowiedz.json()["results"][0]
-            return wynik.get("latitude"), wynik.get("longitude"), wynik.get("name", nazwa_miasta)
+        if odpowiedz.status_code == 200:
+            dane = odpowiedz.json()
+            if "results" in dane and len(dane["results"]) > 0:
+                wynik = dane["results"][0]
+                return wynik.get("latitude"), wynik.get("longitude"), wynik.get("name", nazwa_miasta)
     except:
         pass
     return 52.2300, 21.0100, "Warszawa (Domyślnie)"
@@ -192,6 +194,7 @@ st.sidebar.caption(f"📍 Lokalizacja: {nazwa_wyswietlana} ({szerokosc:.2f}, {dl
 @st.cache_data(ttl=600)
 def pobierz_pogode_open_meteo(lat, lon):
     try:
+        # Prawidłowy link do pobierania pogody Open-Meteo
         url = f"https://open-meteo.com{lat:.4f}&longitude={lon:.4f}&current=temperature_2m,relative_humidity_2m,precipitation,surface_pressure"
         odpowiedz = requests.get(url, timeout=5)
         if odpowiedz.status_code == 200:
