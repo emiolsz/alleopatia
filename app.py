@@ -261,19 +261,24 @@ else:
 # ==========================================
 # 5. MIEJSCE NA STOPKĘ AUTORSKĄ I DEDYKACJĘ
 # ==========================================
+st.sidebar.markdown("<br><br>", unsafe_allow_html=True) # Tworzy duży, naturalny odstęp pionowy od pogody
 st.sidebar.markdown("---")
 
+# Czysty, wyśrodkowany układ bez zbędnych ramek i prostokątów
 st.sidebar.markdown("""
-    <div style='background-color: rgba(255,255,255,0.08); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); margin-top: 10px; text-align: center;'>
-        <p style='margin: 0; font-size: 0.78rem; color: #ccc;'>✍ Projekt i wykonanie:</p>
-        <p style='margin: 3px 0 6px 0; font-size: 0.85rem; color: #ffffff; font-weight: bold;'> Emilia Olszewska </p>
-        <p style='margin: 0; font-size: 0.72rem; color: #bbb;'>© maj 2026 Grządkowisko</p>
-        <p style='margin: 0; font-size: 0.70rem; color: #999; font-style: italic;'>Wszelkie prawa zastrzeżone.</p>
-    </div>
-    
-    <div style='margin-top: 20px; padding: 0 5px; text-align: center;'>
-        <p style='font-style: italic; color: #eaeaea; font-size: 0.85rem; line-height: 1.45; margin: 0;'>
+    <div style='text-align: center; padding: 0 10px; font-family: sans-serif;'>
+        <!-- Dedykacja na pierwszym miejscu, oddzielona przestrzenią -->
+        <p style='font-style: italic; color: #d0e1cd; font-size: 0.82rem; line-height: 1.5; margin: 0 0 25px 0;'>
             ❤️ „Mojemu Tacie, babci Helenie i przyjaciółce Dorotce, a także tym którzy kochają swoje grządeczki z serdecznością”
+        </p>
+        
+        <!-- Dyskretna, mała nota autorska i prawna -->
+        <p style='margin: 0; font-size: 0.75rem; color: #a3c2a0; letter-spacing: 0.5px;'>
+            Projekt i wykonanie: <span style='color: #ffffff; font-weight: 500;'>Emilia Olszewska</span>
+        </p>
+        <p style='margin: 4px 0 0 0; font-size: 0.68rem; color: #8cb388;'>
+            © mai 2026 Grządkowisko · Wszelkie prawa zastrzeżone
         </p>
     </div>
 """, unsafe_allow_html=True)
+
