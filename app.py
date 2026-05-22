@@ -209,6 +209,8 @@ if dane_pogodowe:
         st.sidebar.success("🌱 Warunki stabilne.")
 else:
     st.sidebar.html("<p style='color:#ffaa00; font-size:0.85rem; margin-top:10px; font-family:Arial,sans-serif;'>⚠️ Nie udało się załadować danych meteo.</p>")
+
+
 # ==========================================
 # 4. INTERFEJS UŻYTKOWNIKA (WYSZUKIWARKA ENCYKLOPEDII)
 # ==========================================
