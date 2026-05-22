@@ -147,36 +147,70 @@ st.sidebar.html(f"""
         </div>
     </div>
 """)
- 
+
 # ==========================================
-# 3. LOGIKA: DANE METEOROLOGICZNE IMGW API
+# 3. LOGIKA: POGODA DLA TWOJEJ MIEJSCOWOŚCI
 # ==========================================
-st.sidebar.html("""<h3 style="color: #ffffff !important; margin-top: 15px; margin-bottom: 10px; font-size: 1.3rem; font-family: Arial, sans-serif;">🌤️ Pogoda dla Polski (IMGW)</h3>""")
+import urllib.parse
+
+st.sidebar.html("""<h3 style="color: #ffffff !important; margin-top: 15px; margin-bottom: 5px; font-size: 1.3rem; font-family: Arial, sans-serif;">🌤️ Pogoda Lokalna</h3>""")
+
+# Okienko tekstowe do wpisania dowolnej lokalizacji przez działkowicza
+lokalizacja = st.sidebar.text_input("📍 Wpisz swoją miejscowość / wieś:", value="Warszawa")
 
 @st.cache_data(ttl=1800)
-def pobierz_pogode_imgw():
+def pobierz_pogode_lokalna(miasto):
     try:
-        url = "https://imgw.pl"
-        odpowiedz = requests.get(url, timeout=5)
-        if odpowiedz.status_code == 200:
-            return odpowiedz.json()
+        # Bezpieczne kodowanie polskich znaków (np. Kraków -> Krak%C3%B3w)
+        miasto_kodowane = urllib.parse.quote(miasto.strip())
+        
+        # 1. Geokodowanie - szukanie współrzędnych miejscowości
+        geo_url = f"https://open-meteo.com{miasto_kodowane}&count=1&language=pl&format=json"
+        geo_res = requests.get(geo_url, timeout=5).json()
+        
+        if not geo_res.get("results"):
+            return None
+            
+        lat = geo_res["results"][0]["latitude"]
+        lon = geo_res["results"][0]["longitude"]
+        nazwa_pelna = geo_res["results"][0]["name"]
+        kraj = geo_res["results"][0].get("country", "")
+        
+        # Filtrujemy wyniki, aby upewnić się, że szukamy w Polsce (jeśli wpisano polską wieś)
+        if len(geo_res["results"]) > 1:
+            for res in geo_res["results"]:
+                if res.get("country") == "Polska":
+                    lat = res["latitude"]
+                    lon = res["longitude"]
+                    nazwa_pelna = res["name"]
+                    kraj = "Polska"
+                    break
+        
+        # 2. Pobieranie dokładnych parametrów meteo dla współrzędnych z satelity
+        weather_url = f"https://open-meteo.com{lat}&longitude={lon}&current=temperature_2m,relative_humidity_2m,precipitation&timezone=auto"
+        w_res = requests.get(weather_url, timeout=5).json()
+        
+        current = w_res["current"]
+        return {
+            "miasto": f"{nazwa_pelna} ({kraj})" if kraj else nazwa_pelna,
+            "temp": float(current["temperature_2m"]),
+            "wilgotnosc": float(current["relative_humidity_2m"]),
+            "opad": float(current["precipitation"])
+        }
     except:
         return None
 
-dane_pogodowe = pobierz_pogode_imgw()
+dane_pogodowe = pobierz_pogode_lokalna(lokalizacja)
 
 if dane_pogodowe:
-    stacje = [stacja['stacja'] for stacja in dane_pogodowe]
-    wybrane_miasto = st.sidebar.selectbox("Wybierz stację pomiarową:", sorted(stacje))
-    dane_stacji = next(item for item in dane_pogodowe if item["stacja"] == wybrane_miasto)
+    temp = dane_pogodowe["temp"]
+    opad = dane_pogodowe["opad"]
+    wilgotnosc = dane_pogodowe["wilgotnosc"]
     
-    temp = float(dane_stacji['temperatura'])
-    opad = float(dane_stacji['suma_opadu'])
-    wilgotnosc = float(dane_stacji.get('wilgotnosc_wzgledna', 0))
-    
-    # Renderowanie trzech metryk obok siebie na ciemnozielonym tle
+    # Wyświetlanie metryk w czystym HTML
     st.sidebar.html(f"""
-        <div style="display: flex; justify-content: space-between; margin-top: 10px; margin-bottom: 15px; font-family: Arial, sans-serif; text-align: center;">
+        <p style="color: #d0e1cd !important; font-size: 0.85rem; margin: 0 0 10px 0; font-family: Arial, sans-serif;">Wyniki dla: <b>{dane_pogodowe['miasto']}</b></p>
+        <div style="display: flex; justify-content: space-between; font-family: Arial, sans-serif; text-align: center; margin-bottom: 15px;">
             <div style="background: rgba(255,255,255,0.08); padding: 8px; border-radius: 6px; width: 30%;">
                 <span style="font-size: 0.75rem; color: #ccc; display: block;">Temp.</span>
                 <span style="font-size: 1.1rem; font-weight: bold; color: #fff;">{temp} °C</span>
@@ -209,11 +243,9 @@ if dane_pogodowe:
     elif temp > 25.0 and opad == 0:
         st.sidebar.warning("💧 Susza! Pamiętaj o obfitym podlewaniu wcześnie rano.")
     else:
-        st.sidebar.success("🌱 Warunki stabilne dla wzrostu roślin.")
+        st.sidebar.success("🌱 Warunki stabilne dla wzrostu.")
 else:
-    # Bezpieczny komunikat rezerwowy na wypadek przerw technicznych serwerów państwowych
-    st.sidebar.info("🌱 Serwer IMGW chwilowo nie odpowiada. Pamiętaj o ogólnej zasadzie: podlewaj obficie w ciepłe dni wcześnie rano!")
-
+    st.sidebar.html("<p style='color:#ffaa00; font-size:0.85rem; margin-top:10px; font-family:Arial,sans-serif;'>⚠️ Nie znaleziono miejscowości. Sprawdź pisownię.</p>")
 
 # ==========================================
 # 4. INTERFEJS UŻYTKOWNIKA (WYSZUKIWARKA ENCYKLOPEDII)
