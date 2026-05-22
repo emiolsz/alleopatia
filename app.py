@@ -14,21 +14,21 @@ try:
 except ImportError:
     pass
 
-# 2. Import z krzewy.py
+# 4. Import z krzewy.py
 try:
     from krzewy import krzewy_baza
     baza_roslin.update(krzewy_baza)
 except ImportError:
     pass
 
-# 3. Import z ziola.py
+# 2. Import z ziola.py
 try:
     from ziola import ziola_baza
     baza_roslin.update(ziola_baza)
 except ImportError:
     pass
 
-# 4. Import z kwiaty.py
+# 3. Import z kwiaty.py
 try:
     from kwiaty import kwiaty_baza
     baza_roslin.update(kwiaty_baza)
