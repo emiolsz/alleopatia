@@ -41,7 +41,32 @@ try:
     baza_roslin.update(drzewa_baza)
 except ImportError:
     pass
- 
+ # ==========================================
+# 1. KONFIGURACJA STRONY I WIZUALNEGO STYLU
+# ==========================================
+st.set_page_config(page_title="Grządkowisko", page_icon="🌿", layout="centered")
+
+st.markdown("""
+    <style>
+    /* Prawa strona: Pełny, jednolity, gładki kolor seledynowy (zero przezroczystości) */
+    .stApp {
+        background-color: #e2f7df !important;
+    }
+    
+    /* Lewa strona (panel boczny): Pełny, solidny kolor ciemnozielony (zero przezroczystości) */
+    section[data-testid="stSidebar"] {
+        background-color: #1e3d19 !important;
+    }
+    
+    /* Kolory nagłówków na głównej stronie */
+    h1 {color: #1e3d19; font-family: 'Arial', sans-serif; font-weight: bold;}
+    h3 {color: #2e5a27; font-family: 'Arial', sans-serif;}
+    </style>
+""", unsafe_allow_html=True)
+
+st.title("🌿 Grządkowisko")
+st.subheader("Twój inteligentny asystent ogrodowy")
+
 # ==========================================
 # 2. LOGIKA: KALENDARZ (DATA, DZIEŃ, IMIENINY) i KSIĘŻYC
 # ==========================================
