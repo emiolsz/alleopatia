@@ -1,4 +1,4 @@
-baza_drzew = {
+drzewa_baza = {
     "Morwa": {
         "typ": "Drzewo owocowe", "ph": "6.0 - 7.0", "swiatlo": "Ciepłe, pełne słońce (Południe)", "woda": "Niskie", "gleba": "Piaszczysta, lekka",
         "porada": "Kierunek: Południe. Bardzo wrażliwa na zimne, północne przeciągi. Przyciąga ptaki, dzięki czemu chroni inne uprawy. Pod nią rosną dobrze melisa i nasturcja.",
