@@ -42,7 +42,6 @@ try:
 except ImportError:
     pass
 
-
 # ==========================================
 # 1. KONFIGURACJA STRONY I WIZUALNEGO STYLU
 # ==========================================
@@ -50,17 +49,63 @@ st.set_page_config(page_title="Grządkowisko", page_icon="🌿", layout="centere
 
 st.markdown("""
     <style>
-    .main {background-color: #f4f6f4;}
-    h1 {color: #2e5a27; font-family: 'Arial', sans-serif;}
-    .stButton>button {background-color: #2e5a27; color: white; border-radius: 10px; width: 100%; font-weight: bold; height: 3em;}
-    .stButton>button:hover {background-color: #3d7934; color: white;}
-    .card {background-color: white; padding: 20px; border-radius: 10px; box-shadow: 1px 1px 5px rgba(0,0,0,0.05); margin-bottom: 15px;}
-    .alert-badge {background-color: #ff4b4b; color: white; padding: 4px 8px; border-radius: 5px; font-weight: bold; font-size: 0.8rem; display: inline-block; margin-right: 5px;}
+    /* Półprzezroczyste, pastelowo-zielone tło głównej strony */
+    .stApp {
+        background: linear-gradient(135deg, rgba(233, 245, 230, 0.5) 0%, rgba(255, 255, 255, 0.85) 100%);
+        background-attachment: fixed;
+    }
+    
+    /* Karty z encyklopedii - czysta biel z lekkim cieniem */
+    .stSelectbox, div[data-testid="stVerticalBlock"] > div.stContainer {
+        background-color: #ffffff;
+        padding: 24px;
+        border-radius: 12px;
+        box-shadow: 0px 4px 20px rgba(46, 90, 39, 0.06);
+        border: 1px solid rgba(46, 90, 39, 0.1);
+    }
+    
+    h1 {color: #1e3d19; font-family: 'Arial', sans-serif; font-weight: bold;}
+    h3 {color: #2e5a27; font-family: 'Arial', sans-serif;}
+    
+    /* Panel boczny: ciemnozielony + białe litery */
+    section[data-testid="stSidebar"] {
+        background-color: #1e3d19 !important;
+    }
+    
+    section[data-testid="stSidebar"] *, section[data-testid="stSidebar"] label, section[data-testid="stSidebar"] p {
+        color: #ffffff !important;
+    }
+    
+    section[data-testid="stSidebar"] div[data-baseweb="select"] * {
+        color: #333333 !important;
+    }
+    
+    .stButton>button {
+        background-color: #1e3d19;
+        color: white;
+        border-radius: 10px;
+        width: 100%;
+        font-weight: bold;
+        height: 3em;
+        border: none;
+    }
+    .stButton>button:hover {
+        background-color: #2e5a27;
+        color: white;
+    }
+    
+    .alert-badge {
+        background-color: #ff4b4b;
+        color: white !important;
+        padding: 4px 8px;
+        border-radius: 5px;
+        font-weight: bold;
+        font-size: 0.8rem;
+        display: inline-block;
+        margin-right: 5px;
+    }
     </style>
 """, unsafe_allow_html=True)
-
-st.title("🌿 Grządkowisko")
-st.subheader("Twój inteligentny asystent ogrodowy")
 
 
 # ==========================================
@@ -212,17 +257,22 @@ if baza_roslin:
 else:
     st.info("Dodaj bazy danych na GitHubie (`warzywa.py`, `krzewy.py`, `ziola.py`, `kwiaty.py`, `drzewa.py`), aby encyklopedia zaczęła działać.")
 
-
 # ==========================================
 # 5. MIEJSCE NA STOPKĘ AUTORSKĄ I DEDYKACJĘ
 # ==========================================
 st.sidebar.markdown("---")
-st.sidebar.caption("✍️ Projekt i wykonanie:")
-st.sidebar.markdown("Emilia Olszewska")
 
-# TUTAJ DODAJEMY ZASTRZEŻENIE O PRAWACH AUTORSKICH
-st.sidebar.markdown("<p style='font-size: 0.75rem; color: #888; margin-bottom: 0px;'>© maj 2026 Grządkowisko. Wszelkie prawa zastrzeżone.</p>", unsafe_allow_html=True)
-
-# Dedykacja z ładną, pochyloną czcionką
-st.sidebar.markdown("<p style='font-style: italic; color: #666; font-size: 0.85rem; margin-top: 10px;'>❤️ „Mojemu Tacie, babci Helenie i przyjaciółce Dorotce, a takze tym którzy kochają swoje grządeczki”</p>", unsafe_allow_html=True)
-
+st.sidebar.markdown("""
+    <div style='background-color: rgba(255,255,255,0.08); padding: 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); margin-top: 10px;'>
+        <p style='margin: 0; font-size: 0.8rem; color: #ccc; font-weight: bold;'>✍ *Projekt i wykonanie:*</p>
+        <p style='margin: 3px 0 10px 0; font-size: 1.1rem; color: #ffffff; font-weight: bold;'>Emilia Olszewska</p>
+        <p style='margin: 0; font-size: 0.75rem; color: #bbb;'>© mai 2026 Grządkowisko</p>
+        <p style='margin: 0; font-size: 0.72rem; color: #999; font-style: italic;'>maj 2026 Wszelkie prawa zastrzeżone.</p>
+    </div>
+    
+    <div style='margin-top: 20px; padding: 0 5px; text-align: center;'>
+        <p style='font-style: italic; color: #eaeaea; font-size: 0.85rem; line-height: 1.45; margin: 0;'>
+            ❤️ „Mojemu Tacie, babci Helenie i przyjaciółce Dorotce, a także tym którzy kochają swoje grządeczki z serdecznością”
+        </p>
+    </div>
+""", unsafe_allow_html=True)
