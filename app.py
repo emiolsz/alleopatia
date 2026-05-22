@@ -259,7 +259,7 @@ else:
 
 st.sidebar.markdown("<br><br>", unsafe_allow_html=True)
 st.sidebar.markdown("---")
-st.sidebar.html("""
+
     <div style="text-align: center; font-family: Arial, sans-serif; background-color: #1e3d19 !important; padding: 10px 0; width: 100%;">
         <!-- Dedykacja -->
         <p style="font-style: italic; color: #d0e1cd; font-size: 0.82rem; line-height: 1.5; margin: 0 0 25px 0;">
@@ -274,4 +274,3 @@ st.sidebar.html("""
         © 2026 Grządkowisko 🥕🌸🍃🍎 Wszelkie prawa zastrzeżone
         </p>
     </div>
-""")
