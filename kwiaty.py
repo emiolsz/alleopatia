@@ -1,4 +1,4 @@
-baza_kwiatow = {
+kwiaty_baza = {
     "Nagietek": {
         "typ": "Kwiat Pożyteczny", "ph": "6.0 - 7.0", "swiatlo": "Słoneczne", "woda": "Średnie", "gleba": "Uniwersalna, przepuszczalna",
         "porada": "Wydzieliny jego korzeni niszczą nicienie glebowe. Sadź masowo między warzywami, truskawkami i krzewami owocowymi.",
