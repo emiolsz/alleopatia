@@ -1,4 +1,4 @@
-baza_warzyw = {
+warzywa_baza = {
     "Brokuł": {
         "typ": "Warzywo", "ph": "6.2 - 7.0", "swiatlo": "Pełne słońce", "woda": "Wysokie", "gleba": "Żyzna, próchnicza",
         "porada": "Młode brokuły osłaniaj siatką przed motylami bielinkami.",
