@@ -218,10 +218,10 @@ else:
 # ==========================================
 st.sidebar.markdown("---")
 st.sidebar.caption("✍️ Projekt i wykonanie:")
-st.sidebar.markdown("Emilia Olszewska maj 2026")
+st.sidebar.markdown("Emilia Olszewska")
 
 # TUTAJ DODAJEMY ZASTRZEŻENIE O PRAWACH AUTORSKICH
-st.sidebar.markdown("<p style='font-size: 0.75rem; color: #888; margin-bottom: 0px;'>© 2026 Grządkowisko. Wszelkie prawa zastrzeżone.</p>", unsafe_allow_html=True)
+st.sidebar.markdown("<p style='font-size: 0.75rem; color: #888; margin-bottom: 0px;'>© maj 2026 Grządkowisko. Wszelkie prawa zastrzeżone.</p>", unsafe_allow_html=True)
 
 # Dedykacja z ładną, pochyloną czcionką
 st.sidebar.markdown("<p style='font-style: italic; color: #666; font-size: 0.85rem; margin-top: 10px;'>❤️ „Mojemu Tacie, babci Helenie i przyjaciółce Dorotce, a takze tym którzy kochają swoje grządeczki”</p>", unsafe_allow_html=True)
