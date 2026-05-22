@@ -49,40 +49,54 @@ st.set_page_config(page_title="Grządkowisko", page_icon="🌿", layout="centere
 
 st.markdown("""
     <style>
-    /* Półprzezroczyste, pastelowo-zielone tło głównej strony */
+    /* NOWE TŁO PRAWEJ STRONY: Łagodny, jasny kolor seledynowy */
     .stApp {
-        background: linear-gradient(135deg, rgba(233, 245, 230, 0.5) 0%, rgba(255, 255, 255, 0.85) 100%);
+        background-color: #e2f7df !important;
         background-attachment: fixed;
     }
     
-    /* POPRAWKA: Białe tło wyłącznie dla kart na głównej stronie (nie dotyczy paska bocznego) */
-    .main div[data-testid="stContainer"] {
+    /* Białe karty w sekcji głównej (stMain) dla zachowania idealnego kontrastu */
+    section[data-testid="stMain"] div[data-testid="stVerticalBlock"] > div {
         background-color: #ffffff !important;
         padding: 24px;
         border-radius: 12px;
-        box-shadow: 0px 4px 20px rgba(46, 90, 39, 0.06);
-        border: 1px solid rgba(46, 90, 39, 0.1);
+        box-shadow: 0px 4px 20px rgba(46, 90, 39, 0.04);
+        border: 1px solid rgba(46, 90, 39, 0.08);
+    }
+    
+    /* Wyłączenie białego tła dla kontenerów w panelu bocznym (brak ramek w stopce) */
+    section[data-testid="stSidebar"] div {
+        background-color: transparent !important;
+        box-shadow: none !important;
+        border: none !important;
+    }
+    
+    /* Tło dla dymka kalendarza księżycowego w panelu bocznym */
+    section[data-testid="stSidebar"] div[data-testid="stNotification"] {
+        background-color: rgba(255, 255, 255, 0.1) !important;
     }
     
     h1 {color: #1e3d19; font-family: 'Arial', sans-serif; font-weight: bold;}
     h3 {color: #2e5a27; font-family: 'Arial', sans-serif;}
     
-    /* Panel boczny: ciemnozielony */
+    /* Panel boczny: powrót do ciemnej zieleni */
     section[data-testid="stSidebar"] {
         background-color: #1e3d19 !important;
     }
     
-    section[data-testid="stSidebar"] *, section[data-testid="stSidebar"] label, section[data-testid="stSidebar"] p {
+    /* Białe napisy w panelu bocznym */
+    section[data-testid="stSidebar"] *, section[data-testid="stSidebar"] label, section[data-testid="stSidebar"] p, section[data-testid="stSidebar"] h3 {
         color: #ffffff !important;
     }
     
+    /* Tekst wewnątrz rozwijanych list w panelu bocznym */
     section[data-testid="stSidebar"] div[data-baseweb="select"] * {
         color: #333333 !important;
     }
     
     .stButton>button {
         background-color: #1e3d19;
-        color: white;
+        color: white !important;
         border-radius: 10px;
         width: 100%;
         font-weight: bold;
@@ -91,7 +105,7 @@ st.markdown("""
     }
     .stButton>button:hover {
         background-color: #2e5a27;
-        color: white;
+        color: white !important;
     }
     
     .alert-badge {
@@ -106,7 +120,6 @@ st.markdown("""
     }
     </style>
 """, unsafe_allow_html=True)
-
   
 # ==========================================
 # 2. LOGIKA: KALENDARZ (DATA, DZIEŃ, IMIENINY) i KSIĘŻYC
