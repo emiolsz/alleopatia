@@ -1,7 +1,6 @@
 import streamlit as st
 import requests
 from datetime import datetime
-from porady import porady_dnia
 
 # ========================================================
 # AUTOMATYCZNE ŁĄCZENIE BAZ DANYCH Z 5 OSOBNYCH PLIKÓW (ORYGINALNE)
@@ -40,6 +39,22 @@ except ImportError:
 try:
     from drzewa import drzewa_baza
     baza_roslin.update(drzewa_baza)
+except ImportError:
+    pass
+# 6. Import i automatyczne wyświetlanie porady dnia
+try:
+    from porady_dnia import porady_dnia
+    
+    # Pobieramy aktualny dzień roku (liczba od 1 do 365)
+    dzien_roku = datetime.now().timetuple().tm_yday
+    
+    # Pobieramy właściwą poradę na dziś ze słownika
+    dzisiejsza_porada = porady_dnia.get(dzien_roku, "Udanej pracy w ogrodzie! Dbaj o swoje rośliny.")
+    
+    # Wyświetlamy pobraną poradę na stronie w ładnej ramce
+    st.subheader("🌱 Porada na dziś")
+    st.info(dzisiejsza_porada)
+
 except ImportError:
     pass
 
