@@ -45,46 +45,224 @@ except ImportError:
 # ==========================================
 # 1. KONFIGURACJA STRONY I WIZUALNEGO STYLU
 # ==========================================
-st.set_page_config(page_title="Grządkowisko", page_icon="🌿", layout="centered")
 
 st.markdown("""
-    <style>
-    /* Nowoczesne, jasne tło szałwiowe strony głównej */
-    .stApp {
-        background-color: #F3F7F4 !important;
-    }
-    
-    /* Panel boczny: Solidna, głęboka zieleń botaniczna */
+<style>
+
+# ==========================================
+#  TŁO APLIKACJI
+# ==========================================
+
+.stApp {
+    background-color: #F3F7F4 !important;
+}
+
+/* ==========================================
+   SIDEBAR - KOMPUTER
+========================================== */
+
+section[data-testid="stSidebar"] {
+    background: linear-gradient(
+        180deg,
+        #14311D 0%,
+        #1A3322 100%
+    ) !important;
+
+    width: 33vw !important;
+    min-width: 360px !important;
+    max-width: 520px !important;
+
+    border-right: 1px solid rgba(255,255,255,0.06);
+}
+
+/* naprawa szerokości sidebar */
+section[data-testid="stSidebar"] > div {
+    width: 100% !important;
+}
+
+/* ==========================================
+   GŁÓWNA TREŚĆ
+========================================== */
+
+.main .block-container {
+    max-width: 1400px;
+    padding-top: 2rem;
+    padding-left: 3rem;
+    padding-right: 3rem;
+    padding-bottom: 2rem;
+}
+
+/* ==========================================
+   TYPOGRAFIA
+========================================== */
+
+h1 {
+    color: #1A3322 !important;
+    font-family: Arial, sans-serif;
+    font-weight: 800;
+    font-size: 2.4rem;
+}
+
+h2 {
+    color: #21452D !important;
+    font-weight: 700;
+}
+
+h3 {
+    color: #2D5237 !important;
+    font-family: Arial, sans-serif;
+    font-weight: bold;
+}
+
+/* ==========================================
+   KARTY GŁÓWNE
+========================================== */
+
+.geo-card {
+    background: #ffffff;
+    padding: 24px;
+    border-radius: 18px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.05);
+    margin-bottom: 22px;
+    border: 1px solid #E2EFE5;
+}
+
+/* ==========================================
+   KARTY SIDEBAR
+========================================== */
+
+.sidebar-card {
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(10px);
+
+    padding: 16px;
+    border-radius: 18px;
+
+    border: 1px solid rgba(255,255,255,0.08);
+
+    margin-bottom: 18px;
+
+    box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+}
+
+/* ==========================================
+   SELECTBOX
+========================================== */
+
+.stSelectbox > div > div {
+    border-radius: 14px !important;
+}
+
+/* ==========================================
+   METRYKI POGODY
+========================================== */
+
+[data-testid="metric-container"] {
+    background: rgba(255,255,255,0.08);
+
+    border-radius: 14px;
+
+    border: 1px solid rgba(255,255,255,0.08);
+
+    padding: 12px;
+}
+
+/* ==========================================
+   INFO / ALERTY
+========================================== */
+
+[data-testid="stInfo"] {
+    border-radius: 16px;
+}
+
+[data-testid="stSuccess"] {
+    border-radius: 16px;
+}
+
+[data-testid="stError"] {
+    border-radius: 16px;
+}
+
+[data-testid="stWarning"] {
+    border-radius: 16px;
+}
+
+/* ==========================================
+   TABLET
+========================================== */
+
+@media (max-width: 1024px) {
+
     section[data-testid="stSidebar"] {
-        background-color: #1A3322 !important;
+        width: 40vw !important;
+        min-width: 280px !important;
     }
-    section[data-testid="stSidebar"] .stMarkdown, section[data-testid="stSidebar"] p {
-        color: #E2EFE5 !important;
+
+    .main .block-container {
+        padding-left: 2rem;
+        padding-right: 2rem;
     }
-    
-    /* Kolory nagłówków na głównej stronie */
-    h1 {color: #1A3322; font-family: 'Arial', sans-serif; font-weight: bold;}
-    h3 {color: #2D5237; font-family: 'Arial', sans-serif; font-weight: bold;}
-    
-    /* Estetyczne białe karty na zawartość strony głównej */
-    .geo-card {
-        background: #ffffff;
-        padding: 22px;
-        border-radius: 14px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-        margin-bottom: 20px;
-        border: 1px solid #E2EFE5;
+
+    h1 {
+        font-size: 2rem;
     }
-    
-    /* Czyste kontenery informacyjne dla panelu bocznego */
+}
+
+/* ==========================================
+   TELEFON
+========================================== */
+
+@media (max-width: 768px) {
+
+    /* sidebar mobilny */
+    section[data-testid="stSidebar"] {
+        width: 88vw !important;
+        min-width: unset !important;
+        max-width: unset !important;
+    }
+
+    /* treść */
+    .main .block-container {
+        padding-left: 0.9rem;
+        padding-right: 0.9rem;
+        padding-top: 1rem;
+    }
+
+    /* nagłówki */
+    h1 {
+        font-size: 1.7rem !important;
+        text-align: center;
+    }
+
+    h3 {
+        font-size: 1rem !important;
+    }
+
+    /* karty */
+    .geo-card,
     .sidebar-card {
-        background: rgba(255, 255, 255, 0.06);
         padding: 14px;
-        border-radius: 10px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        margin-bottom: 15px;
+        border-radius: 14px;
     }
-    </style>
+
+    /* selectbox */
+    .stSelectbox {
+        width: 100%;
+    }
+
+    /* metryki pogody */
+    [data-testid="metric-container"] {
+        padding: 8px;
+        border-radius: 12px;
+    }
+
+    /* mniejsze odstępy */
+    div[data-testid="stVerticalBlock"] {
+        gap: 0.5rem;
+    }
+}
+
+</style>
 """, unsafe_allow_html=True)
 
 st.title("🌿 Grządkowisko")
