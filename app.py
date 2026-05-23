@@ -165,70 +165,68 @@ st.sidebar.html(f"""
 """)          
    
 # ==========================================
-# 3. LOGIKA: DANE METEOROLOGICZNE - AUTOMATYCZNA LOKALIZACJA (OPEN-METEO)
+# 3. LOGIKA: DANE METEOROLOGICZNE IMGW API
 # ==========================================
-import requests
-import streamlit as st
-
-st.sidebar.html("""<h3 style="color: #ffffff !important; margin-top: 15px; margin-bottom: 5px; font-size: 1.2rem; font-family: Arial, sans-serif;">🌤️ Pogoda w Twoim ogrodzie</h3>""")
-
-# Całkowicie natywne i bezpieczne pole tekstowe Streamlit
-miasto = st.sidebar.text_input("Wpisz swoją miejscowość / miasto:", value="Warszawa")    
+st.sidebar.markdown("### 🌤️ Pogoda dla Polski (IMGW)")
 
 @st.cache_data(ttl=3600)
-def pobierz_wspolrzedne_miasta(nazwa_miasta):
+def pobierz_pogode_imgw():
     try:
-        url_geo = f"https://open-meteo.com{nazwa_miasta}&count=1&language=pl&format=json"
-        odpowiedz = requests.get(url_geo, timeout=5)
-        if odpowiedz.status_code == 200:
-            dane = odpowiedz.json()
-            if "results" in dane and len(dane["results"]) > 0:
-                wynik = dane["results"][0]
-                return wynik.get("latitude"), wynik.get("longitude"), wynik.get("name", nazwa_miasta)
-    except:
-        pass
-    return 52.2300, 21.0100, "Warszawa (Domyślnie)"
-
-# Pobieramy dynamicznie współrzędne na podstawie tego, co wpisał użytkownik
-szerokosc, dlugosc, nazwa_wyswietlana = pobierz_wspolrzedne_miasta(miasto)
-st.sidebar.caption(f"📍 Lokalizacja: {nazwa_wyswietlana} ({szerokosc:.2f}, {dlugosc:.2f})")
-
-@st.cache_data(ttl=600)
-def pobierz_pogode_open_meteo(lat, lon):
-    try:
-        # POPRAWIONY URL: właściwa subdomena i parametry zapytania
-        url = f"https://open-meteo.com{lat:.4f}&longitude={lon:.4f}&current=temperature_2m,relative_humidity_2m,precipitation,surface_pressure"
+        url = "https://imgw.pl"
         odpowiedz = requests.get(url, timeout=5)
         if odpowiedz.status_code == 200:
             return odpowiedz.json()
-    except Exception as e:
+    except:
         return None
-    return None
 
-dane_pogodowe = pobierz_pogode_open_meteo(szerokosc, dlugosc)
+dane_pogodowe = pobierz_pogode_imgw()
 
-if dane_pogodowe and "current" in dane_pogodowe:
-    biezace = dane_pogodowe["current"]
-    temp = biezace.get('temperature_2m', 0)
-    opad = biezace.get('precipitation', 0)
-    wilgotnosc = biezace.get('relative_humidity_2m', 0)
-    cisnienie = biezace.get('surface_pressure', 1013)
+if dane_pogodowe:
+    stacje = [stacja['stacja'] for stacja in dane_pogodowe]
+    wybrane_miasto = st.sidebar.selectbox("Wybierz stację pomiarową:", sorted(stacje))
+    dane_stacji = next(item for item in dane_pogodowe if item["stacja"] == wybrane_miasto)
     
-    st.sidebar.html(f"""
-        <div class="sidebar-card" style="background: rgba(0, 0, 0, 0.15); padding: 14px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.1); margin-bottom: 15px;">
-            <div style="font-size: 1.5rem; font-weight: bold; color: #ffffff; margin-bottom: 5px;">{temp}°C</div>
-            <p style="margin: 3px 0; font-size: 0.88rem; color: #E2EFE5;">💧 <b>Wilgotność:</b> {wilgotnosc}%</p>
-            <p style="margin: 3px 0; font-size: 0.88rem; color: #E2EFE5;">🌧️ <b>Opady:</b> {opad} mm</p>
-            <p style="margin: 3px 0; font-size: 0.88rem; color: #E2EFE5;">📉 <b>Ciśnienie:</b> {int(cisnienie)} hPa</p>
-        </div>
-    """)
+    temp = float(dane_stacji['temperatura'])
+    opad = float(dane_stacji['suma_opadu'])
+    wilgotnosc = float(dane_stacji.get('wilgotnosc_wzgledna', 0))
+    
+    # Wyświetlanie trzech podstawowych metryk obok siebie
+    col_temp, col_opad, col_wilg = st.sidebar.columns(3)
+    col_temp.metric(label="Temp.", value=f"{temp} °C")
+    col_opad.metric(label="Opad", value=f"{opad} mm")
+    col_wilg.metric(label="Wilg.", value=f"{wilgotnosc} %")
+    
+    # Wykrywanie zjawisk na podstawie parametrów ze stacji synoptycznej
+    zjawiska = []
+    
+    # 1. Przymrozki
+    if temp < 2.0:
+        zjawiska.append("❄️ Przymrozek")
+    
+    # 2. Mgła (Wysoka wilgotność + niska widzialność, API zwraca ciśnienie/wiatr, szacujemy po wilgotności)
+    if wilgotnosc > 95.0 and temp > 0:
+        zjawiska.append("🌫️ Mgła")
+        
+    # 3. Szadź (Ujemna temperatura + bardzo wysoka wilgotność osadzająca mgłę)
+    if wilgotnosc > 90.0 and temp <= 0:
+        zjawiska.append("🥶 Szadź")
+        
+    if zjawiska:
+        st.sidebar.markdown("**Wykryte zjawiska:**")
+        for zjawisko in zjawiska:
+            st.sidebar.markdown(f"<span class='alert-badge'>{zjawisko}</span>", unsafe_allow_html=True)
+    else:
+        st.sidebar.markdown("_Brak niebezpiecznych zjawisk._")
+        
+    # Ogólny komunikat rolniczy
+    if temp < 4.0:
+        st.sidebar.error("⚠️ Ryzyko przymrozku! Chroń wrażliwe rozsady agrowłókniną.")
+    elif temp > 25.0 and opad == 0:
+        st.sidebar.warning("💧 Susza! Pamiętaj o obfitym podlewaniu wcześnie rano.")
+    else:
+        st.sidebar.success("🌱 Warunki stabilne dla wzrostu.")
 else:
-    st.sidebar.html("""
-        <div class="sidebar-card" style="background: rgba(255, 0, 0, 0.1); border-left: 3px solid #ff4b4b; padding: 14px; border-radius: 10px; margin-bottom: 15px;">
-            <p style="margin: 0; font-size: 0.88rem; color: #ff8f8f;">⚠️ Nie udało się pobrać aktualnych danych pogodowych.</p>
-        </div>
-    """)
-
+    st.sidebar.warning("Nie udało się załadować danych meteo.")
 # ==========================================
 # 4. PANEL BOCZNY: LEGENDA SYMBOLI
 # ==========================================
