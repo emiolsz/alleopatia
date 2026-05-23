@@ -162,71 +162,148 @@ st.sidebar.html(f"""
             <p style="margin: 0; font-size: 0.88rem; line-height: 1.4; color: #ffffff;"><b>Wytyczne:</b> {faza_porada}</p>
         </div>
     </div>
-""")          
+""")             
    
 # ==========================================
 # 3. LOGIKA: DANE METEOROLOGICZNE IMGW API
 # ==========================================
-st.sidebar.markdown("### 🌤️ Pogoda dla Polski (IMGW)")
 
+import requests
+import streamlit as st
+
+st.sidebar.markdown("### 🌤️ Pogoda dla Polski (IMGW)")
+# Bezpieczna konwersja na float
+def safe_float(value, default=0):
+    try:
+        return float(value)
+    except:
+        return default
+# Pobieranie danych pogodowych
 @st.cache_data(ttl=3600)
 def pobierz_pogode_imgw():
     try:
-       url = "https://danepubliczne.imgw.pl/api/data/synop"
+        url = "https://danepubliczne.imgw.pl/api/data/synop"
+
         odpowiedz = requests.get(url, timeout=5)
+
         if odpowiedz.status_code == 200:
             return odpowiedz.json()
-    except:
+        else:
+            return None
+
+    except Exception as e:
+        st.sidebar.error(f"Błąd API IMGW: {e}")
         return None
 
+
+# Pobranie danych
 dane_pogodowe = pobierz_pogode_imgw()
 
+
+# Jeśli dane istnieją
 if dane_pogodowe:
+
+    # Lista stacji
     stacje = [stacja['stacja'] for stacja in dane_pogodowe]
-    wybrane_miasto = st.sidebar.selectbox("Wybierz stację pomiarową:", sorted(stacje))
-    dane_stacji = next(item for item in dane_pogodowe if item["stacja"] == wybrane_miasto)
-    
-    temp = float(dane_stacji['temperatura'])
-    opad = float(dane_stacji['suma_opadu'])
-    wilgotnosc = float(dane_stacji.get('wilgotnosc_wzgledna', 0))
-    
-    # Wyświetlanie trzech podstawowych metryk obok siebie
-    col_temp, col_opad, col_wilg = st.sidebar.columns(3)
-    col_temp.metric(label="Temp.", value=f"{temp} °C")
-    col_opad.metric(label="Opad", value=f"{opad} mm")
-    col_wilg.metric(label="Wilg.", value=f"{wilgotnosc} %")
-    
-    # Wykrywanie zjawisk na podstawie parametrów ze stacji synoptycznej
-    zjawiska = []
-    
-    # 1. Przymrozki
-    if temp < 2.0:
-        zjawiska.append("❄️ Przymrozek")
-    
-    # 2. Mgła (Wysoka wilgotność + niska widzialność, API zwraca ciśnienie/wiatr, szacujemy po wilgotności)
-    if wilgotnosc > 95.0 and temp > 0:
-        zjawiska.append("🌫️ Mgła")
-        
-    # 3. Szadź (Ujemna temperatura + bardzo wysoka wilgotność osadzająca mgłę)
-    if wilgotnosc > 90.0 and temp <= 0:
-        zjawiska.append("🥶 Szadź")
-        
-    if zjawiska:
-        st.sidebar.markdown("**Wykryte zjawiska:**")
-        for zjawisko in zjawiska:
-            st.sidebar.markdown(f"<span class='alert-badge'>{zjawisko}</span>", unsafe_allow_html=True)
-    else:
-        st.sidebar.markdown("_Brak niebezpiecznych zjawisk._")
-        
-    # Ogólny komunikat rolniczy
-    if temp < 4.0:
-        st.sidebar.error("⚠️ Ryzyko przymrozku! Chroń wrażliwe rozsady agrowłókniną.")
-    elif temp > 25.0 and opad == 0:
-        st.sidebar.warning("💧 Susza! Pamiętaj o obfitym podlewaniu wcześnie rano.")
-    else:
-        st.sidebar.success("🌱 Warunki stabilne dla wzrostu.")
+
+    # Wybór miasta
+    wybrane_miasto = st.sidebar.selectbox(
+        "Wybierz stację pomiarową:",
+        sorted(stacje)
+    )
+
+    # Dane wybranej stacji
+    dane_stacji = next(
+        (
+            item for item in dane_pogodowe
+            if item["stacja"] == wybrane_miasto
+        ),
+        None
+    )
+
+    if dane_stacji:
+
+        # Pobranie parametrów
+        temp = safe_float(dane_stacji.get('temperatura'))
+        opad = safe_float(dane_stacji.get('suma_opadu'))
+        wilgotnosc = safe_float(
+            dane_stacji.get('wilgotnosc_wzgledna')
+        )
+
+        # METRYKI
+        col_temp, col_opad, col_wilg = st.sidebar.columns(3)
+
+        col_temp.metric(
+            label="Temp.",
+            value=f"{temp} °C"
+        )
+
+        col_opad.metric(
+            label="Opad",
+            value=f"{opad} mm"
+        )
+
+        col_wilg.metric(
+            label="Wilg.",
+            value=f"{wilgotnosc} %"
+        )
+
+        # Wykrywanie zjawisk
+        zjawiska = []
+
+        # Przymrozek
+        if temp < 2.0:
+            zjawiska.append("❄️ Przymrozek")
+
+        # Mgła
+        if wilgotnosc > 95.0 and temp > 0:
+            zjawiska.append("🌫️ Mgła")
+
+        # Szadź
+        if wilgotnosc > 90.0 and temp <= 0:
+            zjawiska.append("🥶 Szadź")
+
+        # Wyświetlanie zjawisk
+        if zjawiska:
+
+            st.sidebar.markdown("**Wykryte zjawiska:**")
+
+            for zjawisko in zjawiska:
+                st.sidebar.markdown(
+                    f"<span class='alert-badge'>{zjawisko}</span>",
+                    unsafe_allow_html=True
+                )
+
+        else:
+            st.sidebar.markdown(
+                "_Brak niebezpiecznych zjawisk._"
+            )
+
+        # Komunikaty rolnicze
+        if temp < 4.0:
+
+            st.sidebar.error(
+                "⚠️ Ryzyko przymrozku! "
+                "Chroń rozsady agrowłókniną."
+            )
+
+        elif temp > 25.0 and opad == 0:
+
+            st.sidebar.warning(
+                "💧 Susza! "
+                "Pamiętaj o podlewaniu rano."
+            )
+
+        else:
+
+            st.sidebar.success(
+                "🌱 Warunki stabilne dla wzrostu."
+            )
+
 else:
-    st.sidebar.warning("Nie udało się załadować danych meteo.")
+    st.sidebar.warning(
+        "Nie udało się załadować danych meteo."
+    )
 # ==========================================
 # 4. PANEL BOCZNY: LEGENDA SYMBOLI
 # ==========================================
