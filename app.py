@@ -45,86 +45,71 @@ except ImportError:
 # ==========================================
 # 1. KONFIGURACJA STRONY I WIZUALNEGO STYLU
 # ==========================================
+st.set_page_config(
+    page_title="Grządkowisko",
+    page_icon="🌿",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+
 
 st.markdown("""
 <style>
 
-# ==========================================
-#  TŁO APLIKACJI
-# ==========================================
+/* ==========================================
+   TŁO CAŁEJ APLIKACJI
+========================================== */
 
 .stApp {
-    background-color: #F3F7F4 !important;
+    background-color: #F4F7F4 !important;
 }
 
 /* ==========================================
-   SIDEBAR - KOMPUTER
+   SIDEBAR - GŁĘBOKA ZIELEŃ
 ========================================== */
 
 section[data-testid="stSidebar"] {
     background: linear-gradient(
         180deg,
-        #14311D 0%,
-        #1A3322 100%
+        #0D2B16 0%,
+        #14361F 45%,
+        #1B4027 100%
     ) !important;
 
     width: 33vw !important;
-    min-width: 360px !important;
+    min-width: 370px !important;
     max-width: 520px !important;
 
-    border-right: 1px solid rgba(255,255,255,0.06);
+    border-right: 2px solid rgba(255,255,255,0.06);
 }
 
-/* naprawa szerokości sidebar */
+/* poprawka szerokości */
 section[data-testid="stSidebar"] > div {
     width: 100% !important;
+    color: white !important;
 }
 
 /* ==========================================
-   GŁÓWNA TREŚĆ
+   BIAŁE LITERKI W SIDEBAR
 ========================================== */
 
-.main .block-container {
-    max-width: 1400px;
-    padding-top: 2rem;
-    padding-left: 3rem;
-    padding-right: 3rem;
-    padding-bottom: 2rem;
+section[data-testid="stSidebar"] * {
+    color: #FFFFFF !important;
 }
 
-/* ==========================================
-   TYPOGRAFIA
-========================================== */
-
-h1 {
-    color: #1A3322 !important;
-    font-family: Arial, sans-serif;
-    font-weight: 800;
-    font-size: 2.4rem;
+/* selectbox w sidebar */
+section[data-testid="stSidebar"] .stSelectbox label {
+    color: #FFFFFF !important;
 }
 
-h2 {
-    color: #21452D !important;
-    font-weight: 700;
-}
+/* metryki */
+section[data-testid="stSidebar"] [data-testid="metric-container"] {
+    background: rgba(255,255,255,0.08) !important;
 
-h3 {
-    color: #2D5237 !important;
-    font-family: Arial, sans-serif;
-    font-weight: bold;
-}
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.08);
 
-/* ==========================================
-   KARTY GŁÓWNE
-========================================== */
-
-.geo-card {
-    background: #ffffff;
-    padding: 24px;
-    border-radius: 18px;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.05);
-    margin-bottom: 22px;
-    border: 1px solid #E2EFE5;
+    padding: 12px;
 }
 
 /* ==========================================
@@ -133,58 +118,66 @@ h3 {
 
 .sidebar-card {
     background: rgba(255,255,255,0.08);
-    backdrop-filter: blur(10px);
 
-    padding: 16px;
     border-radius: 18px;
+    padding: 18px;
 
     border: 1px solid rgba(255,255,255,0.08);
 
-    margin-bottom: 18px;
+    margin-bottom: 16px;
 
-    box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.18);
 }
 
 /* ==========================================
-   SELECTBOX
+   GŁÓWNA TREŚĆ
+========================================== */
+
+.main .block-container {
+    max-width: 1400px;
+
+    padding-top: 2rem;
+    padding-left: 4rem;
+    padding-right: 4rem;
+    padding-bottom: 2rem;
+}
+
+/* ==========================================
+   NAGŁÓWKI
+========================================== */
+
+h1 {
+    color: #18311E !important;
+    font-size: 2.4rem !important;
+    font-weight: 800 !important;
+}
+
+h2, h3 {
+    color: #26452E !important;
+}
+
+/* ==========================================
+   SELECTBOX GŁÓWNY
 ========================================== */
 
 .stSelectbox > div > div {
-    border-radius: 14px !important;
+    border-radius: 12px !important;
 }
 
 /* ==========================================
-   METRYKI POGODY
-========================================== */
-
-[data-testid="metric-container"] {
-    background: rgba(255,255,255,0.08);
-
-    border-radius: 14px;
-
-    border: 1px solid rgba(255,255,255,0.08);
-
-    padding: 12px;
-}
-
-/* ==========================================
-   INFO / ALERTY
+   INFO BOX
 ========================================== */
 
 [data-testid="stInfo"] {
-    border-radius: 16px;
+    border-radius: 16px !important;
 }
 
 [data-testid="stSuccess"] {
-    border-radius: 16px;
+    border-radius: 16px !important;
 }
 
 [data-testid="stError"] {
-    border-radius: 16px;
-}
-
-[data-testid="stWarning"] {
-    border-radius: 16px;
+    border-radius: 16px !important;
 }
 
 /* ==========================================
@@ -194,17 +187,13 @@ h3 {
 @media (max-width: 1024px) {
 
     section[data-testid="stSidebar"] {
-        width: 40vw !important;
-        min-width: 280px !important;
+        width: 38vw !important;
+        min-width: 300px !important;
     }
 
     .main .block-container {
         padding-left: 2rem;
         padding-right: 2rem;
-    }
-
-    h1 {
-        font-size: 2rem;
     }
 }
 
@@ -214,23 +203,18 @@ h3 {
 
 @media (max-width: 768px) {
 
-    /* sidebar mobilny */
     section[data-testid="stSidebar"] {
         width: 88vw !important;
         min-width: unset !important;
-        max-width: unset !important;
     }
 
-    /* treść */
     .main .block-container {
-        padding-left: 0.9rem;
-        padding-right: 0.9rem;
-        padding-top: 1rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
     }
 
-    /* nagłówki */
     h1 {
-        font-size: 1.7rem !important;
+        font-size: 1.8rem !important;
         text-align: center;
     }
 
@@ -238,27 +222,8 @@ h3 {
         font-size: 1rem !important;
     }
 
-    /* karty */
-    .geo-card,
     .sidebar-card {
         padding: 14px;
-        border-radius: 14px;
-    }
-
-    /* selectbox */
-    .stSelectbox {
-        width: 100%;
-    }
-
-    /* metryki pogody */
-    [data-testid="metric-container"] {
-        padding: 8px;
-        border-radius: 12px;
-    }
-
-    /* mniejsze odstępy */
-    div[data-testid="stVerticalBlock"] {
-        gap: 0.5rem;
     }
 }
 
