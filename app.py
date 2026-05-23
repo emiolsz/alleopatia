@@ -41,22 +41,31 @@ try:
     baza_roslin.update(drzewa_baza)
 except ImportError:
     pass
-# 6. Import i automatyczne wyświetlanie porady dnia
+
+# 6. Import z porady_dnia.py oraz definicja funkcji
 try:
     from porady_dnia import porady_dnia
     
-    # Pobieramy aktualny dzień roku (liczba od 1 do 365)
-    dzien_roku = datetime.now().timetuple().tm_yday
-    
-    # Pobieramy właściwą poradę na dziś ze słownika
-    dzisiejsza_porada = porady_dnia.get(dzien_roku, "Udanej pracy w ogrodzie! Dbaj o swoje rośliny.")
-    
-    # Wyświetlamy pobraną poradę na stronie w ładnej ramce
-    st.subheader("🌱 Porada na dziś")
-    st.info(dzisiejsza_porada)
+    # Wklejamy funkcję tutaj, żeby była dostępna w całym pliku!
+    def pobierz_porade_dnia():
+        dzis = datetime.now()
+        numer_dnia = dzis.timetuple().tm_yday
+        
+        # Bezpiecznik: jeśli słownik jest pusty, zwróć domyślny tekst
+        if not porady_dnia:
+            return "Udanej pracy w ogrodzie!"
+            
+        # Jeśli porady_dnia to słownik, bierzemy klucz, jeśli lista - indeks
+        if isinstance(porady_dnia, dict):
+            return porady_dnia.get(numer_dnia, "Dbaj o swoje rośliny!")
+        
+        indeks = numer_dnia % len(porady_dnia)
+        return porady_dnia[indeks]
 
 except ImportError:
-    pass
+    porady_dnia = {}
+    def pobierz_porade_dnia():
+        return "Udanej pracy w ogrodzie!"
 
 # ==========================================
 # 1. KONFIGURACJA STRONY I WIZUALNEGO STYLU
@@ -246,7 +255,9 @@ h2, h3 {
 
 st.title("🌿 Grządkowisko")
 st.subheader("Twój inteligentny asystent ogrodowy")
-porada_dnia = pobierz_porade_dnia()
+
+# Zmieniamy pobierz_porade_dnia() na zmienną z góry kodu:
+porada_dnia = dzisiejsza_porada 
 st.markdown("### 🌿 Porada dnia")
 st.info(f"**{porada_dnia}**")
 # ==========================================
@@ -305,15 +316,6 @@ def pobierz_dane_kalendarza():
 
 pelna_data, dzien_roku, imieniny = pobierz_dane_kalendarza()
 faza_nazwa, faza_porada = pobierz_faze_ksiezyca()
-
-def pobierz_porade_dnia():
-    dzis = datetime.now()
-
-    numer_dnia = dzis.timetuple().tm_yday
-
-    indeks = numer_dnia % len(porady_dnia)
-
-    return porady_dnia[indeks]
 st.sidebar.html(f"""
     <div style="font-family: Arial, sans-serif; color: #ffffff; padding: 5px 0;">
         <h3 style="color: #ffffff; margin-bottom: 10px; font-size: 1.2rem;">📅 Kalendarz</h3>
