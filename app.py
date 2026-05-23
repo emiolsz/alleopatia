@@ -172,7 +172,7 @@ st.sidebar.markdown("### 🌤️ Pogoda dla Polski (IMGW)")
 @st.cache_data(ttl=3600)
 def pobierz_pogode_imgw():
     try:
-        url = "https://imgw.pl"
+       url = "https://danepubliczne.imgw.pl/api/data/synop"
         odpowiedz = requests.get(url, timeout=5)
         if odpowiedz.status_code == 200:
             return odpowiedz.json()
