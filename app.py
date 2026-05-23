@@ -256,8 +256,9 @@ h2, h3 {
 st.title("🌿 Grządkowisko")
 st.subheader("Twój inteligentny asystent ogrodowy")
 
-# Zmieniamy pobierz_porade_dnia() na zmienną z góry kodu:
-porada_dnia = dzisiejsza_porada 
+# wywołanie funkcji "pobierz_porade_dnia()"
+porada_dnia = pobierz_porade_dnia()  
+
 st.markdown("### 🌿 Porada dnia")
 st.info(f"**{porada_dnia}**")
 # ==========================================
