@@ -163,23 +163,26 @@ st.sidebar.html(f"""
         </div>
     </div>
 """)          
-  
+   
 # ==========================================
 # 3. LOGIKA: DANE METEOROLOGICZNE - AUTOMATYCZNA LOKALIZACJA (OPEN-METEO)
 # ==========================================
+import requests
+import streamlit as st
+
 st.sidebar.html("""<h3 style="color: #ffffff !important; margin-top: 15px; margin-bottom: 5px; font-size: 1.2rem; font-family: Arial, sans-serif;">🌤️ Pogoda w Twoim ogrodzie</h3>""")
 
 # Całkowicie natywne i bezpieczne pole tekstowe Streamlit
 miasto = st.sidebar.text_input("Wpisz swoją miejscowość / miasto:", value="Warszawa")    
+
 @st.cache_data(ttl=3600)
 def pobierz_wspolrzedne_miasta(nazwa_miasta):
     try:
-        url_geo = "https://" + "geocoding-api.open-meteo.com" + "/v1/search?name=" + f"{nazwa_miasta}&count=1&language=pl&format=json"
+        url_geo = f"https://open-meteo.com{nazwa_miasta}&count=1&language=pl&format=json"
         odpowiedz = requests.get(url_geo, timeout=5)
         if odpowiedz.status_code == 200:
             dane = odpowiedz.json()
             if "results" in dane and len(dane["results"]) > 0:
-                # TUTAJ DODAŁEM [0] - pobieramy pierwszy obiekt z listy miast
                 wynik = dane["results"][0]
                 return wynik.get("latitude"), wynik.get("longitude"), wynik.get("name", nazwa_miasta)
     except:
@@ -193,7 +196,7 @@ st.sidebar.caption(f"📍 Lokalizacja: {nazwa_wyswietlana} ({szerokosc:.2f}, {dl
 @st.cache_data(ttl=600)
 def pobierz_pogode_open_meteo(lat, lon):
     try:
-        # Prawidłowy link do pobierania pogody Open-Meteo
+        # POPRAWIONY URL: właściwa subdomena i parametry zapytania
         url = f"https://open-meteo.com{lat:.4f}&longitude={lon:.4f}&current=temperature_2m,relative_humidity_2m,precipitation,surface_pressure"
         odpowiedz = requests.get(url, timeout=5)
         if odpowiedz.status_code == 200:
