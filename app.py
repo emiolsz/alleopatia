@@ -235,17 +235,17 @@ if dane_pogodowe:
 
         col_temp.metric(
             label="Temp.",
-            value=f"{temp} °C"
+            value=f"{temp:.1f}°C"
         )
 
         col_opad.metric(
             label="Opad",
-            value=f"{opad} mm"
+            value=f"{opad:.1f}mm"
         )
 
         col_wilg.metric(
             label="Wilg.",
-            value=f"{wilgotnosc} %"
+            value=f"{wilgotnosc:.0f}%"
         )
 
         # Wykrywanie zjawisk
