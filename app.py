@@ -1,6 +1,7 @@
 import streamlit as st
 import requests
 from datetime import datetime
+from porady import porady_dnia
 
 # ========================================================
 # AUTOMATYCZNE ŁĄCZENIE BAZ DANYCH Z 5 OSOBNYCH PLIKÓW (ORYGINALNE)
@@ -51,8 +52,6 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
-
-
 st.markdown("""
 <style>
 
@@ -232,7 +231,9 @@ h2, h3 {
 
 st.title("🌿 Grządkowisko")
 st.subheader("Twój inteligentny asystent ogrodowy")
-
+porada_dnia = pobierz_porade_dnia()
+st.markdown("### 🌿 Porada dnia")
+st.info(f"**{porada_dnia}**")
 # ==========================================
 # 2. LOGIKA: KALENDARZ (DATA, DZIEŃ, IMIENINY) i KSIĘŻYC
 # ==========================================
@@ -290,6 +291,14 @@ def pobierz_dane_kalendarza():
 pelna_data, dzien_roku, imieniny = pobierz_dane_kalendarza()
 faza_nazwa, faza_porada = pobierz_faze_ksiezyca()
 
+def pobierz_porade_dnia():
+    dzis = datetime.now()
+
+    numer_dnia = dzis.timetuple().tm_yday
+
+    indeks = numer_dnia % len(porady_dnia)
+
+    return porady_dnia[indeks]
 st.sidebar.html(f"""
     <div style="font-family: Arial, sans-serif; color: #ffffff; padding: 5px 0;">
         <h3 style="color: #ffffff; margin-bottom: 10px; font-size: 1.2rem;">📅 Kalendarz</h3>
