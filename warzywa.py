@@ -1,16 +1,16 @@
 warzywa_baza = {
-        "Bób": {
+    "Arbuz": {
+        "typ": "Warzywo", "ph": "6.0 - 7.0", "swiatlo": "Słoneczne, osłonięte", "woda": "Wysokie", "gleba": "Bardzo bogata w składniki odżywcze",
+        "porada": "Dynia świetnie rośnie na pryzmie kompostowej, ocieniając ją swoimi liśćmi. Warto sadzić ją koło nasturcji ",
+        "korzystne": ["Cebula", "Czosnek","Rzodkiewka", "Seler", "Buraki", "Fasola"], "niekorzystne": ["Cukinia","Dynia","Ogórek"]
+              
+    },
+     "Bób": {
         "typ": "Warzywo", "ph": "6.5 - 7.0", "swiatlo": "Słoneczne", "woda": "Wysokie (zwłaszcza podczas kwitnienia)", "gleba": "Ciężka, żyzna, dobrze zatrzymująca wilgoć",
         "porada": "Jak wszystkie motylkowe, bób silnie wzbogaca glebę w azot. Aby uchronić go przed czarną mszycą, posadź w rzędach cząber ogrodowy lub nasturcję, a po zawiązaniu strąków usuń czubki wzrostu.",
         "korzystne": ["Ziemniak", "Kapusta", "Marchew", "Sałata", "Cząber", "Nasturcja"], "niekorzystne": ["Cebula", "Czosnek", "Por", "Pomidor"]
     },
-         "Arbuz": {
-        "typ": "Warzywo", "ph": "6.0 - 7.0", "swiatlo": "Słoneczne, osłonięte", "woda": "Wysokie", "gleba": "Bardzo bogata w składniki odżywcze",
-        "porada": "Dynia świetnie rośnie na pryzmie kompostowej, ocieniając ją swoimi liśćmi. Warto sadzić ją koło nasturcji ",
-        "korzystne": ["Cebula", "Czosnek","Rzodkiewka", "Seler", "Buraki", "Fasola"], "niekorzystne": ["Cukinia","Dynia","Ogórek"]
-
-                 
-    },
+       
     "Brokuł": {
         "typ": "Warzywo", "ph": "6.2 - 7.0", "swiatlo": "Pełne słońce", "woda": "Wysokie", "gleba": "Żyzna, próchnicza",
         "porada": "Młode brokuły osłaniaj siatką przed motylami bielinkami.",
