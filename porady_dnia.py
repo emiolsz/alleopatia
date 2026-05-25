@@ -1,17 +1,29 @@
 porady_dnia = {
     1: "Porada na 1 stycznia...",
+    130: "Porada na dziś sobota (10 maja):🍅 "Groch : Wymaga jasnego stanowiska, świetnie radzi sobie w niższych temperaturach (to warzywo wczesnowiosenne)..",
+    131: "Porada na dziś sobota (11 maja):🍅 Pomidory lubią głębokie podlewanie, ale rzadziej.",
+    132: "Porada na dziś sobota (12 maja):🍅 Pomidory lubią głębokie podlewanie, ale rzadziej.",
+    133: "Porada na dziś sobota (13 maja):🍅 Pomidory lubią głębokie podlewanie, ale rzadziej.", 
+    134: "Porada na dziś sobota (14 maja):🍅 Pomidory lubią głębokie podlewanie, ale rzadziej.",
+    135: "Porada na dziś sobota (15 maja):🍅 Pomidory lubią głębokie podlewanie, ale rzadziej.",
+    136: "Porada na dziś sobota (16 maja):🍅 Pomidory lubią głębokie podlewanie, ale rzadziej.",
+    137: "Porada na dziś sobota (17 maja):🍅 Fasola wiąże azot z powietrza w glebie, działając jak darmowy nawóz dla sąsiadów. – 100% prawdy. Dzięki symbiozie z bakteriami brodawkowymi (Rhizobium) fasola potrafi pobierać azot z atmosfery i wzbogacać nim glebę. To fundament płodozmianu i uprawy współrzędnej.", 
+    138: "Porada na dziś sobota (18 maja):🍅 Pomidory lubią głębokie podlewanie, ale rzadziej.",
+    139: "Porada na dziś sobota (19 maja):🍅 Pomidory lubią głębokie podlewanie, ale rzadziej.",
+    140: "Porada na dziś sobota (20 maja):🍅 Pomidory lubią głębokie podlewanie, ale rzadziej.",
+    141: "Porada na dziś sobota (21 maja):🍅 Pomidory lubią głębokie podlewanie, ale rzadziej.",
+    142: "Porada na dziś sobota (22 maja):🍅 Pomidory lubią głębokie podlewanie, ale rzadziej.",
     143: "Porada na dziś sobota (23 maja):🍅 Pomidory lubią głębokie podlewanie, ale rzadziej.",
     144: "Porada na dziś niedziela (24 maja):🌿 Zioła najlepiej zbierać rano, zanim słońce odbierze aromat.",
     145: "Porada na dziś poniedziałek (25 maja):🥕 Marchew lepiej kiełkuje w stale wilgotnej glebie.",
-    146: "Porada na dziś wtorek (26 maja):🥕 Optymalny termin siewu nasion Ogórków bezpośrednio do gruntu to okres między 15 maja a 7 czerwca.",
+    146: "Porada na dziś wtorek (26 maja):🥒 Optymalny termin siewu nasion Ogórków bezpośrednio do gruntu to okres między 15 maja a 7 czerwca.",
     147: "Porada na dziś środa (27 maja):🌸 Usuwanie przekwitłych kwiatów pobudza dalsze kwitnienie.",
     148: "Porada na dziś czwartek (28 maja):🌱 Nie podlewaj w pełnym słońcu — krople mogą przypalać liście.",
     149: "Porada na dziś piątek (29 maja):🍎 Drzewa owocowe warto podlewać rzadziej, ale obficie.",
     150: "Porada na dziś sobotę (30 maja):🌧️ Po deszczu warto spulchnić glebę, by nie tworzyła skorupy.",
-    151: "Porada na dziś sobotę (30 maja):🌱 Kompost działa najlepiej, gdy jest lekko wilgotny.",
-    152: "Porada na dziś sobotę (1 czerwca):🪴 Nie przesadzaj z nawozem — przenawożenie szkodzi bardziej niż niedobór.",
-    
+    151: "Porada na dziś niedzielę (31 maja):🌱 Kompost działa najlepiej, gdy jest lekko wilgotny.",
+    152: "Porada na dziś poniedziałek (1 czerwca):🪴 Nie przesadzaj z nawozem — przenawożenie szkodzi bardziej niż niedobór.",
+    153: "Porada na dziś wtorek (2 czerwca):🌸 Usuwanie przekwitłych kwiatów pobudza dalsze kwitnienie.",
     
     365: "Porada na 31 grudnia..."
 }
-
