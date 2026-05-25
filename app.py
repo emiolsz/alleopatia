@@ -1,6 +1,20 @@
 import streamlit as st
 import requests
 from datetime import datetime
+# zmniejszenie marginesow na telefonie
+st.markdown(
+    """
+    <style>
+    /* Zmniejsza boczne marginesy aplikacji na telefonie */
+    .block-container {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+        padding-top: 1rem !important;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
 
 # ========================================================
 # AUTOMATYCZNE ŁĄCZENIE BAZ DANYCH Z 5 OSOBNYCH PLIKÓW (ORYGINALNE)
