@@ -13,14 +13,14 @@ warzywa_baza = {
        
     "Brokuł": {
         "typ": "Warzywo", "ph": "6.2 - 7.0", "swiatlo": "Pełne słońce", "woda": "Wysokie", "gleba": "Żyzna, próchnicza",
-        "porada": "Młode brokuły osłaniaj siatką przed motylami bielinkami lub zastosuj rośliny odstraszające. BŁĄD (jest dokładnie odwrotnie). Cebula (oraz inne czosnkowe, jak czosnek czy por) to jedno z najlepszych i najbardziej polecanych towarzystw dla brokułu. Intensywny zapach cebuli działa jak naturalna bariera – dezorientuje i odstrasza szkodniki kapustne (m.in. śmietkę kapuścianą czy gąsienice). Brokuł potrzebuje stale wilgotnej gleby, ale jest bardzo wrażliwy na zalewanie korzeni i stojącą wodę. Dodatkowo podlewając brokuły, nie wolno lać wody na liście i rozwijające się róże, ponieważ natychmiast prowadzi to do chorób grzybowych i gnicia.",
-        "korzystne": ["Brukselka", "Jarmuż", "Pasternak", "Pietruszka", "Por", "Ziemniak"],
+        "porada": "Młode brokuły osłaniaj siatką przed motylami bielinkami lub zastosuj rośliny odstraszające. Cebula i inne czosnkowe, jak czosnek czy por) to jedno z najlepszych i najbardziej polecanych towarzystw dla brokułu. Intensywny zapach cebuli działa jak naturalna bariera – dezorientuje i odstrasza szkodniki kapustne (m.in. śmietkę kapuścianą czy gąsienice). Brokuł potrzebuje stale wilgotnej gleby, ale jest bardzo wrażliwy na zalewanie korzeni i stojącą wodę. Dodatkowo podlewając brokuły, nie wolno lać wody na liście i rozwijające się róże, ponieważ natychmiast prowadzi to do chorób grzybowych i gnicia.",
+        "korzystne": ["Cebula", "Pasternak", "Pietruszka", "Por", "Ziemniak"],
         "niekorzystne": ["Pomidor", "Cebula","Brukselka", "Jarmuż"]
     },
     "Brukselka": {
-        "typ": "Warzywo", "ph": "6.5 - 7.5", "swiatlo": "Słoneczne", "woda": "Średnie", "gleba": "Ciężka, gliniasto-gliniasta",
-        "porada": "Zrywaj dolne liście jesienią, by przyspieszyć zawiązywanie małych główek.",
-        "korzystne": ["Brokuł", "Ziemniak"], "niekorzystne": ["Pomidor"]
+        "typ": "Warzywo", "ph": "6.5 - 7.5", "swiatlo": "Słoneczne", "woda": "Wysokie", "gleba": "Gliniasto-piaszczysta, ale żyżna i głęboko uprawiana",
+        "porada": "Wysokie wymagania wodne, zwłaszcza pod koniec lata i jesienią, gdy intensywnie zawiązuje główki. Przesuszenie gleby powoduje, że główki są luźne, małe i gorzkie.",
+        "korzystne": ["Cebula", "Czosnek", "Seler", "Sałata", "Koper", "Mięta", "Aksamitka"], "niekorzystne": ["Brokuł", "Ziemniak", "Pomidor"]
     },
     "Burak ćwikłowy": {
         "typ": "Warzywo", "ph": "6.0 - 7.5", "swiatlo": "Słoneczne do półcienia", "woda": "Średnie", "gleba": "Przepuszczalna",
