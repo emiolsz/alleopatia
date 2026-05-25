@@ -29,7 +29,7 @@ porady_dnia = {
     152: "Porada na dziś poniedziałek (1 czerwca):🪴 Nie przesadzaj z nawozem — przenawożenie szkodzi bardziej niż niedobór.",
     153: "Porada na dziś wtorek (2 czerwca):🌸 Usuwanie przekwitłych kwiatów pobudza dalsze kwitnienie.",
     154: "Porada na dziś środa (3 czerwca):🥬 Endywia wymaga regularnego podlewania (przesuszenie powoduje twardość i gorycz). Zwiąż jej liście na 2 tygodnie przed zbiorem w suchy dzień, aby środek zbladł i stracił gorzki smak.",
-    155: "Porada na dziś czwartek (4 czerwca):🥬 Jarmuż preferuje odczyn zbliżony do obojętnego (ochrona przed kiłą kapuścianą). Doskonale radzi sobie w półcieniu, ale potrzebuje regularnego podlewania, by liście nie stały się łykowate.",
+    155: "Porada na dziś czwartek (4 czerwca): "Kontroluj niedobory wody, niektore warzywa potzrebuaj jej wiecej, inne mniej, każda z roślin ma inne potrzeby",
     156: "Porada na dziś piątek (5 czerwca):🥬 Jarmuż smakuje najlepiej po pierwszych przymrozkach – niskie temperatury powodują, że zawarta w liściach skrobia przekształca się w cukry proste, przez co warzywo traci gorycz.",
     157: "Porada na dziś sobota (6 czerwca):🍏 Kalarepa nienawidzi gwałtownych skoków wilgotności (susza, a potem obfity deszcz powodują pękanie bulw). Długotrwający brak wody zmusza roślinę do wytworzenia twardych, łykowatych włókien.",
     158: "Porada na dziś niedziela (7 czerwca):🥦 Brokuły: Usuwa się wyłącznie liście żółte, uszkodzone lub chore. Kluczowym zabiegiem jesiennym (wrzesień/październik) dla przyspieszenia wzrostu główek jest ogławianie (ścięcie czubka).",
