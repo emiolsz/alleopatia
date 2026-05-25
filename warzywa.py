@@ -4,6 +4,13 @@ warzywa_baza = {
         "porada": "Jak wszystkie motylkowe, bób silnie wzbogaca glebę w azot. Aby uchronić go przed czarną mszycą, posadź w rzędach cząber ogrodowy lub nasturcję, a po zawiązaniu strąków usuń czubki wzrostu.",
         "korzystne": ["Ziemniak", "Kapusta", "Marchew", "Sałata", "Cząber", "Nasturcja"], "niekorzystne": ["Cebula", "Czosnek", "Por", "Pomidor"]
     },
+         "Arbuz": {
+        "typ": "Warzywo", "ph": "6.0 - 7.0", "swiatlo": "Słoneczne, osłonięte", "woda": "Wysokie", "gleba": "Bardzo bogata w składniki odżywcze",
+        "porada": "Dynia świetnie rośnie na pryzmie kompostowej, ocieniając ją swoimi liśćmi. Warto sadzić ją koło nasturcji ",
+        "korzystne": ["Cebula", "Czosnek","Rzodkiewka", "Seler", "Buraki", "Fasola"], "niekorzystne": ["Cukinia","Dynia","Ogórek"]
+
+                 
+    },
     "Brokuł": {
         "typ": "Warzywo", "ph": "6.2 - 7.0", "swiatlo": "Pełne słońce", "woda": "Wysokie", "gleba": "Żyzna, próchnicza",
         "porada": "Młode brokuły osłaniaj siatką przed motylami bielinkami.",
@@ -23,9 +30,9 @@ warzywa_baza = {
     },
     "Cebula": {
         "typ": "Warzywo", "ph": "6.5 - 7.0", "swiatlo": "Pełne słońce", "woda": "Niskie", "gleba": "Żyzna, lekka",
-        "porada": "Wymieszaj z ziemią fusy z kawy przed sadzeniem dymki – spulchnią glebę i odstraszą szkodniki.",
-        "korzystne": ["Burak ćwikłowy", "Cukinie", "Cykoria", "Fasola", "Kalarepa", "Koper", "Marchew", "Ogórek", "Pasternak", "Pomidor", "Por", "Sałata"],
-        "niekorzystne": ["Groch", "Fasola tyczna", "Rzodkiewka"]
+        "porada": "Wymieszaj z ziemią fusy z kawy przed sadzeniem dymki – spulchnią glebę i odstraszą szkodniki. Sasiedztwo Por i Cebula jest molziwe jednak maja te same szkodniki, dlatego sasiedztwo mus byc kontrolowane",
+        "korzystne": ["Burak ćwikłowy", "Cukinie", "Cykoria", "Kalarepa", "Koper", "Marchew", "Ogórek", "Pasternak", "Pomidor", "Por", "Sałata"],
+        "niekorzystne": ["Groch", "Fasola", "Fasola tyczna", "Rzodkiewka"]
     },
     "Cukinia": {
         "typ": "Warzywo", "ph": "6.0 - 7.0", "swiatlo": "Słoneczne, ciepłe", "woda": "Wysokie", "gleba": "Bardzo żyzna, kompostowa",
@@ -44,8 +51,8 @@ warzywa_baza = {
     },
     "Dynia": {
         "typ": "Warzywo", "ph": "6.0 - 7.0", "swiatlo": "Słoneczne, osłonięte", "woda": "Wysokie", "gleba": "Bardzo bogata w składniki odżywcze",
-        "porada": "Dynia świetnie rośnie na pryzmie kompostowej, ocieniając ją swoimi liśćmi.",
-        "korzystne": ["Fasola", "Kukurydza"], "niekorzystne": ["Ziemniak"]
+        "porada": "Dynia świetnie rośnie na pryzmie kompostowej, ocieniając ją swoimi liśćmi. Warto sadzić ją koło nasturcji ",
+        "korzystne": ["Fasola", "Kukurydza"], "niekorzystne": ["Ziemniak""Ogórek""Arbuz"]
     },
     "Endywia": {
         "typ": "Warzywo", "ph": "6.0 - 6.8", "swiatlo": "Słoneczne", "woda": "Średnie", "gleba": "Żyzna, przepuszczalna",
