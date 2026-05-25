@@ -15,7 +15,7 @@ warzywa_baza = {
         "typ": "Warzywo", "ph": "6.2 - 7.0", "swiatlo": "Pełne słońce", "woda": "Wysokie", "gleba": "Żyzna, próchnicza",
         "porada": "Młode brokuły osłaniaj siatką przed motylami bielinkami lub zastosuj rośliny odstraszające. Brokuł potrzebuje stale wilgotnej gleby, ale jest bardzo wrażliwy na zalewanie korzeni i stojącą wodę. Dodatkowo podlewając brokuły, nie wolno lać wody na liście i rozwijające się róże, ponieważ natychmiast prowadzi to do chorób grzybowych i gnicia.",
         "korzystne": ["Brukselka", "Jarmuż", "Pasternak", "Pietruszka", "Por", "Ziemniak"],
-        "niekorzystne": ["Pomidor", "Cebula"]
+        "niekorzystne": ["Pomidor", "Cebula","Brukselka", "Jarmuż"]
     },
     "Brukselka": {
         "typ": "Warzywo", "ph": "6.5 - 7.5", "swiatlo": "Słoneczne", "woda": "Średnie", "gleba": "Ciężka, gliniasto-gliniasta",
