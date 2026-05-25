@@ -33,6 +33,10 @@ porady_dnia = {
     156: "Porada na dziś piątek (5 czerwca):🥬 Jarmuż smakuje najlepiej po pierwszych przymrozkach – niskie temperatury powodują, że zawarta w liściach skrobia przekształca się w cukry proste, przez co warzywo traci gorycz.",
     157: "Porada na dziś sobota (6 czerwca):🍏 Kalarepa nienawidzi gwałtownych skoków wilgotności (susza, a potem obfity deszcz powodują pękanie bulw). Długotrwający brak wody zmusza roślinę do wytworzenia twardych, łykowatych włókien.",
     158: "Porada na dziś niedziela (7 czerwca):🥦 Brokuły: Usuwa się wyłącznie liście żółte, uszkodzone lub chore. Kluczowym zabiegiem jesiennym (wrzesień/październik) dla przyspieszenia wzrostu główek jest ogławianie (ścięcie czubka).",
-    
+
+
+
+    # --- SIERPIEŃ ---
+    243: "Porada na dziś poniedziałek (31 sierpnia):🥬 Przygotuj się na jesień: nie wyrywaj jeszcze jarmużu! Smakuje on najlepiej dopiero po pierwszych przymrozkach – niskie temperatury zamieniają skrobię w cukry proste, dzięki czemu traci gorycz.",
     365: "Porada na 31 grudnia..."
 }
