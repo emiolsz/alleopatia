@@ -3,7 +3,7 @@ porady_dnia = {
     143: "Porada na dziś sobota (23 maja):🍅 Pomidory lubią głębokie podlewanie, ale rzadziej.",
     144: "Porada na dziś niedziela (24 maja):🌿 Zioła najlepiej zbierać rano, zanim słońce odbierze aromat.",
     145: "Porada na dziś poniedziałek (25 maja):🥕 Marchew lepiej kiełkuje w stale wilgotnej glebie.",
-    146: "Porada na dziś wtorek (26 maja):🐌 Rozsypane skorupki jaj pomagają ograniczyć ślimaki.",
+    146: "Porada na dziś wtorek (26 maja):🥕 Optymalny termin siewu nasion Ogórków bezpośrednio do gruntu to okres między 15 maja a 7 czerwca.",
     147: "Porada na dziś środa (27 maja):🌸 Usuwanie przekwitłych kwiatów pobudza dalsze kwitnienie.",
     148: "Porada na dziś czwartek (28 maja):🌱 Nie podlewaj w pełnym słońcu — krople mogą przypalać liście.",
     149: "Porada na dziś piątek (29 maja):🍎 Drzewa owocowe warto podlewać rzadziej, ale obficie.",
