@@ -179,7 +179,5 @@ warzywa_baza = {
         "porada": "Regularnie obsypuj krzaki ziemią (rób redliny) – chroni to rozwijające się bulwy przed światłem słonecznym, pod wpływem którego zielenieją i stają się trujące (wytwarzają solaninę).",
         "korzystne": ["Fasola karłowa", "Chrzan", "Kapusta", "Kalarepa", "Brokuł", "Brukselka", "Cebula", "Czosnek", "Koper", "Aksamitka", "Nasturcja"], 
         "niekorzystne": ["Pomidor", "Ogórek", "Dynia", "Cukinia", "Arbuz", "Słonecznik", "Marchew", "Burak ćwikłowy", "Fasola tyczna"]
-    },
-
     }
 }
