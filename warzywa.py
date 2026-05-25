@@ -1,7 +1,7 @@
 warzywa_baza = {
     "Arbuz": {
         "typ": "Warzywo", "ph": "6.0 - 7.0", "swiatlo": "Słoneczne, osłonięte", "woda": "Wysokie", "gleba": "Bardzo bogata w składniki odżywcze",
-        "porada": "Dynia świetnie rośnie na pryzmie kompostowej, ocieniając ją swoimi liśćmi. Warto sadzić ją koło nasturcji ",
+        "porada": "Cebula i czosnek: naturalnie odstraszają mszyce i chronią arbuza przed chorobami grzybowymi. Seler i buraki: mają płytki system korzeniowy i nie będą konkurować z arbuzem o składniki odżywcze z głębszych warstw.",
         "korzystne": ["Cebula", "Czosnek","Rzodkiewka", "Seler", "Buraki", "Fasola"], "niekorzystne": ["Cukinia","Dynia","Ogórek"]
               
     },
