@@ -1,6 +1,8 @@
 import streamlit as st
 import requests
 from datetime import datetime
+from imieniny import baza_imienin
+
 # zmniejszenie marginesow na telefonie
 st.markdown(
     """
@@ -300,20 +302,25 @@ def pobierz_faze_ksiezyca():
     else:
         return "🌗 Ostatnia kwadra", "Dni 🥕. Soki schodzą w dół. Najlepszy czas na siew marchewki, pietruszki, rzodkiewki."
 
-baza_imienin = {
-    1: {1: "Mieszka, Mieczysława", 2: "Makarego, Bazylego", 22: "Wincentego, Anastazego"},
-    2: {2: "Marii, Mirosława", 14: "Walentego, Cyryla"},
-    3: {4: "Kazimierza, Łucji", 19: "Józefa, Bogdana"},
-    4: {23: "Wojciecha, Jerzego", 30: "Mariana, Katarzyny"},
-    5: {1: "Józefa, Filipa", 8: "Stanisława, Lizy", 12: "Pankracego (Ogrodnika)", 13: "Serwacego (Ogrodnika)", 14: "Bonifacego (Ogrodnika)", 15: "Zofii (Zimnej Zośki), Izydora", 22: "Heleny, Wiesławy, Julii", 23: "Emilii, Iwony"},
-    6: {1: "Jakuba, Konrada", 24: "Jana, Danuty", 29: "Piotra, Pawła"},
-    7: {22: "Magdaleny, Bolesława", 26: "Anny, Mirosławy"},
-    8: {15: "Marii, Napoleona", 26: "Marii, Częstochowskiej"},
-    9: {17: "Franciszka, Roberta", 30: "Zofii, Hieronima"},
-    10: {4: "Franciszka, Rozalii", 25: "Darii, Sambora"},
-    11: {1: "Wszystkich Świętych", 11: "Marcina, Bartłomieja", 30: "Andrzeja, Maurycego"},
-    12: {4: "Barbary, Krystiana", 6: "Mikołaja, Jacynty", 24: "Adama, Ewy"}
-}
+def pobierz_dane_kalendarza():
+    dzis = datetime.now()
+    dni_tygodnia = ["Poniedziałek", "Wtorek", "Środa", "Czwartek", "Piątek", "Sobota", "Niedziela"]
+    miesiace = ["stycznia", "lutego", "marca", "kwietnia", "maja", "czerwca", "lipca", "sierpnia", "września", "października", "listopada", "grudnia"]
+    
+    dzien_tyg = dni_tygodnia[dzis.weekday()]
+    nazwa_miesiaca = miesiace[dzis.month - 1]
+    
+    pelna_data = f"{dzien_tyg}, {dzis.day} {nazwa_miesiaca} {dzis.year}"
+    
+    rok_przestepny = 366 if (dzis.year % 4 == 0 and (dzis.year % 100 != 0 or dzis.year % 400 == 0)) else 365
+    dzien_roku = dzis.timetuple().tm_yday
+    tekst_dni_roku = f"{dzien_roku}/{rok_przestepny}"
+    
+    # Łączenie z plikiem imieniny.py
+    imieniny = baza_imienin.get(dzis.month, {}).get(dzis.day, "Brak danych o imieninach")
+    return pelna_data, tekst_dni_roku, imieniny
+
+
 
 def pobierz_dane_kalendarza():
     dzis = datetime.now()
